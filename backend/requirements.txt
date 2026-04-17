@@ -1,0 +1,13 @@
+fastapi
+uvicorn
+neo4j
+spacy
+pdfplumber
+python-docx
+scikit-learn
+pandas
+numpy
+joblib
+FlagEmbedding
+torch
+transformers
