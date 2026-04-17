@@ -36,7 +36,110 @@ function RankBadge({ rank }) {
     </div>
   );
 }
+const TIPS = [
+  {
+    title: 'AI Skill Matching',
+    body: 'Our AI cross-references candidate skills against your job description for precise fit scoring.',
+    svg: (
+      <svg fill="none" stroke="url(#g1)" viewBox="0 0 24 24" style={{ width: 36, height: 36 }}>
+        <defs><linearGradient id="g1" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stopColor="#7c3aed"/><stop offset="100%" stopColor="#06b6d4"/></linearGradient></defs>
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+      </svg>
+    )
+  },
+  {
+    title: 'Semantic Similarity',
+    body: 'Beyond keywords — we understand context. A "software engineer" and "developer" are treated as equivalent.',
+    svg: (
+      <svg fill="none" stroke="url(#g2)" viewBox="0 0 24 24" style={{ width: 36, height: 36 }}>
+        <defs><linearGradient id="g2" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stopColor="#7c3aed"/><stop offset="100%" stopColor="#06b6d4"/></linearGradient></defs>
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+      </svg>
+    )
+  },
+  {
+    title: 'Integrity Score',
+    body: "Detects copy-pasted or AI-generated resumes to ensure you're seeing authentic candidates.",
+    svg: (
+      <svg fill="none" stroke="url(#g3)" viewBox="0 0 24 24" style={{ width: 36, height: 36 }}>
+        <defs><linearGradient id="g3" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stopColor="#7c3aed"/><stop offset="100%" stopColor="#06b6d4"/></linearGradient></defs>
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+      </svg>
+    )
+  },
+  {
+    title: 'Real-time Rankings',
+    body: 'Leaderboard updates instantly as new applications arrive — no refresh needed.',
+    svg: (
+      <svg fill="none" stroke="url(#g4)" viewBox="0 0 24 24" style={{ width: 36, height: 36 }}>
+        <defs><linearGradient id="g4" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stopColor="#7c3aed"/><stop offset="100%" stopColor="#06b6d4"/></linearGradient></defs>
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M13 10V3L4 14h7v7l9-11h-7z" />
+      </svg>
+    )
+  },
+  {
+    title: 'Final Score Formula',
+    body: 'Final score = weighted blend of Skill Match, Semantic Similarity, and Integrity — tuned for hiring accuracy.',
+    svg: (
+      <svg fill="none" stroke="url(#g5)" viewBox="0 0 24 24" style={{ width: 36, height: 36 }}>
+        <defs><linearGradient id="g5" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stopColor="#7c3aed"/><stop offset="100%" stopColor="#06b6d4"/></linearGradient></defs>
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+      </svg>
+    )
+  },
+];
 
+function TipsCarousel() {
+  const [active, setActive] = React.useState(0);
+  React.useEffect(() => {
+    const timer = setInterval(() => setActive(prev => (prev + 1) % TIPS.length), 3500);
+    return () => clearInterval(timer);
+  }, []);
+  const tip = TIPS[active];
+  return (
+    <div style={{
+      background: '#fff', borderRadius: 12, border: '1px solid #e5e7eb',
+      padding: '36px 40px', display: 'flex', flexDirection: 'column',
+      alignItems: 'center', textAlign: 'center', minHeight: 220,
+      justifyContent: 'center', position: 'relative', overflow: 'hidden'
+    }}>
+      <div style={{
+        position: 'absolute', top: 0, left: 0, right: 0, height: 3,
+        background: 'linear-gradient(90deg, #2e0052, #06b6d4)',
+        borderRadius: '12px 12px 0 0'
+      }} />
+      <div style={{
+        width: 64, height: 64, borderRadius: 16, marginBottom: 16,
+        background: 'linear-gradient(135deg, rgba(124,58,237,.08), rgba(6,182,212,.08))',
+        border: '1px solid rgba(124,58,237,.15)',
+        display: 'flex', alignItems: 'center', justifyContent: 'center'
+      }}>
+        {tip.svg}
+      </div>
+      <div style={{ fontFamily: 'Manrope', fontWeight: 800, fontSize: 18, color: '#111827', marginBottom: 8 }}>
+        {tip.title}
+      </div>
+      <div style={{ fontSize: 14, color: '#6b7280', maxWidth: 480, lineHeight: 1.6 }}>
+        {tip.body}
+      </div>
+      <div style={{ display: 'flex', gap: 6, marginTop: 24 }}>
+        {TIPS.map((_, i) => (
+          <div key={i} onClick={() => setActive(i)} style={{
+            width: i === active ? 20 : 6, height: 6, borderRadius: 3,
+            background: i === active ? '#2e0052' : '#e5e7eb',
+            cursor: 'pointer', transition: 'all 0.3s ease'
+          }} />
+        ))}
+      </div>
+      <div style={{ marginTop: 20, fontSize: 12, color: '#9ca3af', display: 'flex', alignItems: 'center', gap: 6 }}>
+        <svg fill="none" stroke="#9ca3af" viewBox="0 0 24 24" style={{ width: 13, height: 13 }}>
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5" />
+        </svg>
+        Select a job listing from the sidebar to view the AI-ranked leaderboard
+      </div>
+    </div>
+  );
+}
 export default function RecruiterPage() {
   const [jobs, setJobs] = useState([]);
   const [selectedJob, setSelectedJob] = useState(null);
@@ -46,6 +149,7 @@ export default function RecruiterPage() {
   const [isPosting, setIsPosting] = useState(false);
   const [postError, setPostError] = useState('');
   const [showForm, setShowForm] = useState(false);
+  const [totalApplicants, setTotalApplicants] = useState(0);
   const [availablejobs, setAvailableJobs] = useState([]);
   useEffect(() => { fetchJobs(); }, []);
   const availableJobs = async () => {
@@ -55,12 +159,26 @@ export default function RecruiterPage() {
     } catch (e) { console.error(e); }
   }
   const fetchJobs = async () => {
-    try {
-      const r = await fetch('http://localhost:8000/api/jobs');
-      setJobs(await r.json());
-    } catch (e) { console.error(e); }
-  };
+  try {
+    const r = await fetch('http://localhost:8000/api/jobs');
+    const jobsData = await r.json();
+    setJobs(jobsData);
 
+    // 🔥 Fetch applications count for all jobs
+    let total = 0;
+
+    for (let job of jobsData) {
+      const res = await fetch(`http://localhost:8000/api/jobs/${job.id}/applications`);
+      const apps = await res.json();
+      total += apps.length;
+    }
+
+    setTotalApplicants(total);
+
+  } catch (e) {
+    console.error(e);
+  }
+};
   const handleCreate = async () => {
     if (!newTitle.trim() || !newDesc.trim()) { setPostError('Both fields are required.'); return; }
     setIsPosting(true); setPostError('');
@@ -119,8 +237,8 @@ export default function RecruiterPage() {
             </svg>
           </div>
           <div className="sidebar-logo-text">
-            <div className="name" style={{ fontFamily: 'Manrope', fontWeight: 800, fontSize: 18 }}>Aira</div>
-            <div className="sub" style={{ fontSize: 11, color: '#6b7280' }}>Recruiter Portal</div>
+            <div className="name" style={{ fontFamily: 'Manrope', fontWeight: 800, fontSize: 18,color: '#111827' }}>Aira</div>
+            <div className="sub" style={{ fontSize: 11, color: '#4b5563' }}>Recruiter Portal</div>
           </div>
         </div>
 
@@ -193,6 +311,7 @@ export default function RecruiterPage() {
               onChange={e => setNewTitle(e.target.value)}
               style={{
                 fontSize: 13,
+                color: '#111827',
                 padding: '10px 12px',
                 border: '1px solid #e5e7eb',
                 borderRadius: 6,
@@ -213,6 +332,7 @@ export default function RecruiterPage() {
               style={{
                 resize: 'vertical',
                 fontSize: 13,
+                color: '#111827',
                 lineHeight: 1.5,
                 padding: '10px 12px',
                 border: '1px solid #e5e7eb',
@@ -248,23 +368,24 @@ export default function RecruiterPage() {
         )}
 
         {/* Job list */}
-        <div style={{ fontSize: 11, fontWeight: 700, color: '#6b7280', textTransform: 'uppercase', letterSpacing: '.08em', marginBottom: 10 }}>
+        <div style={{ fontSize: 11, fontWeight: 700, color: '#111827', textTransform: 'uppercase', letterSpacing: '.08em', marginBottom: 10 }}>
           Active Listings ({jobs.length})
         </div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8, overflowY: 'auto', flex: 1 }}>
           {jobs.length === 0 ? (
-            <p style={{ fontSize: 13, color: '#6b7280', padding: '12px 0' }}>No jobs yet.</p>
+            <p style={{ fontSize: 13, color: 'black', padding: '12px 0' }}>No jobs yet.</p>
           ) : jobs.map(job => (
             <div key={job.id} className={`job-card ${selectedJob?.id === job.id ? 'active' : ''}`} onClick={() => selectJob(job)} style={{
               padding: '12px',
               borderRadius: 8,
               cursor: 'pointer',
               transition: 'all 0.2s',
+              
               background: selectedJob?.id === job.id ? '#f3f4f6' : 'transparent',
               border: selectedJob?.id === job.id ? '1px solid #e5e7eb' : '1px solid transparent'
             }}>
-              <div className="title" style={{ fontWeight: 600, fontSize: 14, marginBottom: 4, wordBreak: 'break-word' }}>{job.title}</div>
-              <div className="desc" style={{ fontSize: 12, color: '#6b7280', overflow: 'hidden', textOverflow: 'ellipsis', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', wordBreak: 'break-word' }}>{job.description}</div>
+              <div className="title" style={{ fontWeight: 600, fontSize: 14, marginBottom: 4, wordBreak: 'break-word',color: '#111827' }}>{job.title}</div>
+              <div className="desc" style={{ fontSize: 12, color: '#4b5563', overflow: 'hidden', textOverflow: 'ellipsis', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', wordBreak: 'break-word' }}>{job.description}</div>
             </div>
           ))}
         </div>
@@ -296,15 +417,14 @@ export default function RecruiterPage() {
         {!selectedJob ? (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 32, maxWidth: 1200 }}>
             <div className="fade-up">
-              <h1 style={{ fontFamily: 'Manrope', fontWeight: 900, fontSize: 'clamp(24px, 5vw, 34px)', margin: '0 0 8px', letterSpacing: '-1px', wordBreak: 'break-word' }}>Recruiter Dashboard</h1>
-              <p style={{ color: '#6b7280', fontSize: 15, margin: 0 }}>Create job postings and review AI-graded applicants ranked by overall fit.</p>
+<h1 style={{ fontFamily: 'Manrope', fontWeight: 900, fontSize: 'clamp(24px, 5vw, 34px)', margin: '0 0 8px', letterSpacing: '-1px', wordBreak: 'break-word', color: '#111827' }}>Recruiter Dashboard</h1>              <p style={{ color: '#4b5563', fontSize: 15, margin: 0 }}>Create job postings and review AI-graded applicants ranked by overall fit.</p>
             </div>
 
             {/* Stats Row */}
             <div className="fade-up-d1" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 16 }}>
               {[
                 { icon: 'work', label: 'Active Postings', value: jobs.length, color: '124,58,237' },
-                { icon: 'group', label: 'Total Applicants', value: '—', color: '6,182,212' },
+                { icon: 'group', label: 'Total Applicants', value: totalApplicants, color: '6,182,212' },
                 { icon: 'speed', label: 'Avg Turnaround', value: '< 30s', color: '16,185,129' },
               ].map(({ icon, label, value, color }, i) => (
                 <div key={i} className="card fade-up" style={{ padding: '24px', display: 'flex', alignItems: 'center', gap: 16, background: '#fff', borderRadius: 12, border: '1px solid #e5e7eb' }}>
@@ -317,25 +437,24 @@ export default function RecruiterPage() {
                   </div>
                   <div>
                     <div style={{ fontFamily: 'Manrope', fontWeight: 800, fontSize: 28, color: `rgb(${color})` }}>{value}</div>
-                    <div style={{ fontSize: 13, color: '#6b7280', marginTop: 2 }}>{label}</div>
+                    <div style={{ fontSize: 13, color: '#4b5563', marginTop: 2 }}>{label}</div>
                   </div>
                 </div>
               ))}
             </div>
 
-            <div className="empty-state fade-up-d2" style={{
-              textAlign: 'center',
-              padding: '60px 20px',
-              background: '#fff',
-              borderRadius: 12,
-              border: '1px solid #e5e7eb'
-            }}>
-              <svg className="w-12 h-12 mx-auto mb-4" fill="none" stroke="#6b7280" viewBox="0 0 24 24" style={{ width: 48, height: 48, margin: '0 auto 16px', color: '#9ca3af' }}>
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122" />
-              </svg>
-              <p style={{ fontFamily: 'Manrope', fontWeight: 700, fontSize: 16, margin: '0 0 4px' }}>Select a job listing</p>
-              <p style={{ fontSize: 13, color: '#6b7280', margin: 0 }}>to view the AI-ranked leaderboard of applicants</p>
-            </div>
+            {/* Replace this entire div: */}
+
+
+{/* With this: */}
+<div className="fade-up-d2" style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+
+
+ 
+  {/* Tips Carousel */}
+  <TipsCarousel />
+
+</div>
           </div>
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 28, maxWidth: '100%', overflowX: 'auto' }}>
@@ -360,8 +479,7 @@ export default function RecruiterPage() {
                   </svg>
                   All Jobs
                 </button>
-                <h1 style={{ fontFamily: 'Manrope', fontWeight: 900, fontSize: 'clamp(24px, 5vw, 30px)', margin: '0 0 6px', letterSpacing: '-1px', wordBreak: 'break-word' }}>{selectedJob.title}</h1>
-                <p style={{ fontSize: 13, color: '#6b7280', margin: 0 }}>
+<h1 style={{ fontFamily: 'Manrope', fontWeight: 900, fontSize: 'clamp(24px, 5vw, 30px)', margin: '0 0 6px', letterSpacing: '-1px', wordBreak: 'break-word', color: '#111827' }}>{selectedJob.title}</h1>                <p style={{ fontSize: 13, color: '#4b5563', margin: 0 }}>
                   {applications.length} applicant{applications.length !== 1 ? 's' : ''} · ranked by AI score
                 </p>
               </div>
@@ -382,11 +500,11 @@ export default function RecruiterPage() {
                 borderRadius: 12,
                 border: '1px solid #e5e7eb'
               }}>
-                <svg className="w-12 h-12 mx-auto mb-4" fill="none" stroke="#6b7280" viewBox="0 0 24 24" style={{ width: 48, height: 48, margin: '0 auto 16px', color: '#9ca3af' }}>
+                <svg className="w-12 h-12 mx-auto mb-4" fill="none" stroke="#4b5563" viewBox="0 0 24 24" style={{ width: 48, height: 48, margin: '0 auto 16px', color: '#9ca3af' }}>
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
                 </svg>
                 <p style={{ fontFamily: 'Manrope', fontWeight: 700, fontSize: 16, margin: '0 0 4px' }}>No applications yet</p>
-                <p style={{ fontSize: 13, color: '#6b7280', margin: '0 0 12px' }}>Share the Candidate Portal link to start receiving applications.</p>
+                <p style={{ fontSize: 13, color: '#4b5563', margin: '0 0 12px' }}>Share the Candidate Portal link to start receiving applications.</p>
                 <Link to="/candidate" className="btn btn-ghost" style={{
                   fontSize: 13,
                   padding: '8px 16px',
@@ -416,7 +534,7 @@ export default function RecruiterPage() {
                   padding: '0 20px 12px 20px',
                   fontSize: 11,
                   fontWeight: 700,
-                  color: '#6b7280',
+                  color: '#4b5563',
                   textTransform: 'uppercase',
                   letterSpacing: '.07em',
                   borderBottom: '1px solid #e5e7eb',
@@ -454,8 +572,8 @@ export default function RecruiterPage() {
                         style={{ width: 40, height: 40, borderRadius: '50%', flexShrink: 0, border: '1px solid #e5e7eb' }}
                       />
                       <div style={{ overflow: 'hidden' }}>
-                        <div style={{ fontWeight: 700, fontSize: 15, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{app.candidate_name}</div>
-                        <div style={{ fontSize: 12, color: '#6b7280', marginTop: 2 }}>Applied via Aira Portal</div>
+                        <div style={{ fontWeight: 700, fontSize: 15, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',color: '#111827' }}>{app.candidate_name}</div>
+                        <div style={{ fontSize: 12, color: '#4b5563', marginTop: 2 }}>Applied via Aira Portal</div>
                       </div>
                     </div>
 

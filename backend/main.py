@@ -4,7 +4,7 @@ import os
 import shutil
 from typing import List, Dict, Any, Optional
 from pydantic import BaseModel
-
+import numpy as np
 from services.parser_service import parse_resume
 from services.graph_service import GraphService
 from services.ner_service import NERService
@@ -137,6 +137,7 @@ async def analyze_resume(
                 missing_skills.append(req["skill"])
 
         skill_match_final = (skill_score_sum / total_weight) * 100
+        skill_match_final = float(skill_match_final)
         print(f"[5/8] Skill match: {matched_skills} | Missing: {missing_skills}")
         print(f"       Skill match score: {skill_match_final}")
 
@@ -145,17 +146,18 @@ async def analyze_resume(
         jd_text_context = job_description if job_description else ". ".join(required_skill_names) + "."
         print(f"[6/8] Computing semantic similarity...")
         sim_result = similarity_service.compute_similarity(jd_text_context, full_text)
-        semantic_score = sim_result["overall_score"]
+        semantic_score = float(sim_result["overall_score"])
         print(f"       Semantic score: {semantic_score}")
 
         # 7. Fraud Detection (20%)
         print(f"[7/8] Running fraud detection...")
         fraud_result = fraud_service.detect_fraud(full_text, list(resume_skills))
-        integrity_score = fraud_result["integrity_score"]
+        integrity_score = float(fraud_result["integrity_score"])
+
         print(f"       Integrity score: {integrity_score}")
 
         # 8. Aggregation
-        final_score = (
+        final_score = float(
             (skill_match_final * 0.4) +
             (semantic_score * 0.4) +
             (integrity_score * 0.2)
@@ -177,7 +179,15 @@ async def analyze_resume(
         recommendations = rec_service.get_recommendations(missing_skills)
         print(f"       Recommendations: {recommendations}")
         print("### RESPONSE SENT ###\n")
+        def convert(obj):
+            if isinstance(obj, (np.float32, np.float64)):
+                return float(obj)
+            return obj
 
+        sim_details = [
+            {k: convert(v) for k, v in item.items()}
+            for item in sim_result["details"]
+        ]
         return {
             "candidate_name": parsed_data["extracted_fields"].get("contact", {}).get("name", "Unknown"),
             "final_score": round(final_score, 2),
@@ -190,7 +200,7 @@ async def analyze_resume(
                 "matched_skills": matched_skills,
                 "missing_skills": missing_skills,
                 "fraud_report": fraud_result,
-                "similarity_report": sim_result["details"]
+                "similarity_report": sim_details
             },
             "recommendations": recommendations
         }

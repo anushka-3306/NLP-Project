@@ -169,7 +169,7 @@ export default function CandidatePage() {
             </svg>
           </div>
           <div className="sidebar-logo-text">
-            <div className="name" style={{ fontFamily: 'Manrope', fontWeight: 800, fontSize: 18 }}>Aira</div>
+            <div className="name" style={{ fontFamily: 'Manrope', fontWeight: 800, fontSize: 18 ,color: '#111827'}}>Aira</div>
             <div className="sub" style={{ fontSize: 11, color: '#6b7280' }}>Candidate Portal</div>
           </div>
         </div>
@@ -262,7 +262,7 @@ export default function CandidatePage() {
                     if (job) setSelectedJob(job);
                   }}
                 >
-                  <div style={{ fontWeight: 600, fontSize: 13, marginBottom: 6, wordBreak: 'break-word' }}>
+                  <div style={{ fontWeight: 600, fontSize: 13, marginBottom: 6, wordBreak: 'break-word',color: '#111827' }}>
                     {app.job_title}
                   </div>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
@@ -350,9 +350,9 @@ export default function CandidatePage() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
                 </svg>
               </div>
-              <h3 className="font-['Manrope'] font-bold text-lg mb-2 break-all max-w-full">
-                {file ? file.name : "Drag & Drop Resume"}
-              </h3>
+              <h3 className="font-['Manrope'] font-bold text-lg mb-2 break-all max-w-full text-gray-900">
+  {file ? file.name : "Drag & Drop Resume"}
+</h3>
               <p className="text-[#4c4451] text-sm mb-6">
                 {file ? `${(file.size / 1024 / 1024).toFixed(2)} MB` : "Supports PDF, DOCX (Max 10MB)"}
               </p>

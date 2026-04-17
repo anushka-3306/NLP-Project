@@ -2,7 +2,7 @@ from neo4j import GraphDatabase
 import os
 
 class GraphService:
-    def __init__(self, uri="bolt://localhost:7687", user="neo4j", password="attackontitan7"):
+    def __init__(self, uri="bolt://localhost:7687", user="neo4j", password="password"):
         self.driver = GraphDatabase.driver(uri, auth=(user, password))
 
     def close(self):
