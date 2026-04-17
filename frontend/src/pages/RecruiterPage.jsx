@@ -46,9 +46,14 @@ export default function RecruiterPage() {
   const [isPosting, setIsPosting] = useState(false);
   const [postError, setPostError] = useState('');
   const [showForm, setShowForm] = useState(false);
-
+  const [availablejobs, setAvailableJobs] = useState([]);
   useEffect(() => { fetchJobs(); }, []);
-
+  const availableJobs = async () => {
+    try {
+      const r = await fetch('http://localhost:8000/jobs');
+      setAvailableJobs(await r.json());
+    } catch (e) { console.error(e); }
+  }
   const fetchJobs = async () => {
     try {
       const r = await fetch('http://localhost:8000/api/jobs');
@@ -78,7 +83,11 @@ export default function RecruiterPage() {
       setApplications(await r.json());
     } catch (e) { console.error(e); }
   };
-
+  useEffect(() => {
+    if (showForm) {
+      availableJobs();
+    }
+  }, [showForm]);
   return (
     <div style={{ display: 'flex', minHeight: '100vh', background: '#f8f9fa' }}>
 
@@ -177,7 +186,7 @@ export default function RecruiterPage() {
         {/* Inline create form */}
         {showForm && (
           <div style={{ marginBottom: 20, display: 'flex', flexDirection: 'column', gap: 10 }}>
-            <input
+            <select
               className="input-field"
               placeholder="Job Title"
               value={newTitle}
@@ -189,7 +198,12 @@ export default function RecruiterPage() {
                 borderRadius: 6,
                 outline: 'none'
               }}
-            />
+            >
+              <option value="">Select Job Title</option>
+              {availablejobs.map((job, i) => (
+                <option key={i} value={job}>{job}</option>
+              ))}
+            </select>
             <textarea
               className="input-field"
               placeholder="Job description…"

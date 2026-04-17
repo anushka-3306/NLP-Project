@@ -205,4 +205,10 @@ async def analyze_resume(
             os.remove(file_path)
             print(f"       Temp file cleaned: {file_path}")
 
+@app.get("/jobs")
+async def get_jobs():
+
+    res = graph_service.get_all_jobs()
+    print(res)
+    return res
 
