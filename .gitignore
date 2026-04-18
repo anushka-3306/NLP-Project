@@ -12,6 +12,8 @@ __pycache__/
 venv/
 env/
 .venv/
+venv_flag/
+.venv_flag/
 
 # Models / large files (optional)
 *.joblib
