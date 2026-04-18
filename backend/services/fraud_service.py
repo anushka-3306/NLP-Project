@@ -92,7 +92,76 @@ class FraudService:
         
         return [rep_score, word_rep, float(max_run), buzz_score, richness, float(has_proj)]
 
-    def detect_fraud(self, text: str, skills: List[str]) -> Dict[str, Any]:
+    def _check_timeline_consistency(self, experience: List[Dict[str, Any]]) -> List[str]:
+        if not experience: return []
+        flags = []
+        parsed_dates = []
+        from dateutil import parser as dt_parser
+        from datetime import datetime
+
+        for exp in experience:
+            duration = exp.get("duration", "")
+            if not duration or "-" not in duration: continue
+            start_str, end_str = duration.split("-", 1)
+            try:
+                start_dt = dt_parser.parse(start_str.strip())
+                if end_str.lower().strip() in ["present", "current", "ongoing", "now"]:
+                    end_dt = datetime.now()
+                else:
+                    end_dt = dt_parser.parse(end_str.strip())
+                parsed_dates.append({"start": start_dt, "end": end_dt, "title": exp.get("title", "Unknown Role")})
+            except Exception:
+                pass
+
+        if len(parsed_dates) < 2: return []
+        
+        parsed_dates.sort(key=lambda x: x["start"])
+        # Detect overlaps and gaps
+        for i in range(1, len(parsed_dates)):
+            prev = parsed_dates[i-1]
+            curr = parsed_dates[i]
+            
+            # Gap detection
+            gap_days = (curr["start"] - prev["end"]).days
+            if gap_days > 365:
+                flags.append(f"Unaccounted chronological gap of {gap_days//365} years before '{curr['title']}'")
+            
+            # Overlap detection
+            if curr["start"] < prev["end"]:
+                overlap_days = (prev["end"] - curr["start"]).days
+                if overlap_days > 180: # 6 months overlap of full time jobs is suspicious
+                    flags.append(f"Suspicious {overlap_days//30} month chronological overlap between '{prev['title']}' and '{curr['title']}'")
+        return flags
+
+    def _check_ai_hallucination(self, text: str) -> List[str]:
+        flags = []
+        words = text.lower().split()
+        
+        # ChatGPT specific signature biases (empirical tracking)
+        ai_signatures = {
+            "delve", "testament", "orchestrated", "spearheaded", "realm", 
+            "multifaceted", "revolutionized", "unwavering", "paradigm", 
+            "tapestry", "demystify", "embark", "landscape", "pivotal"
+        }
+        
+        signature_matches = sum(1 for w in words if w in ai_signatures)
+        if len(words) > 50 and (signature_matches / len(words)) > 0.015: # 1.5% density of rare words is astronomically high
+            flags.append("High semantic fingerprint correlation with AI-generated text")
+            
+        # Burstiness (Sentence length variation)
+        sentences = re.split(r'[.!?]+', text)
+        sentences = [s.strip() for s in sentences if len(s.strip()) > 5]
+        if len(sentences) > 4:
+            lengths = [len(s.split()) for s in sentences]
+            std_dev = np.std(lengths)
+            mean_len = np.mean(lengths)
+            pulse_ratio = std_dev / (mean_len + 1e-5)
+            if pulse_ratio < 0.25: # Very uniform, non-human sentence structure length
+                flags.append("Low linguistic burstiness (machine-like uniform sentence distribution)")
+                
+        return flags
+
+    def detect_fraud(self, text: str, skills: List[str], experience: List[Dict[str, Any]] = None) -> Dict[str, Any]:
         features = self.extract_features(text, skills)
         fs = self.scaler.transform([features])
         
@@ -105,13 +174,25 @@ class FraudService:
         if features[3] > 0.08: flags.append("Excessive buzzword density")
         if features[4] < 0.4: flags.append("Low content diversity (possible template abuse)")
         
+        # New advanced integrity checks
+        if experience:
+            flags.extend(self._check_timeline_consistency(experience))
+            
+        flags.extend(self._check_ai_hallucination(text))
+        
+        # Base verdict logic from Isolation Forest
         verdict = "Normal"
         if len(flags) >= 2 or score < -0.19: verdict = "High Risk"
         elif len(flags) == 1 or score < -0.15: verdict = "Suspicious"
+        
+        baseline_integrity = max(0, 100 + (score * 200))
+        penalty = len(flags) * 12.5 # Deduct sharply for rule-based heuristics
+        final_integrity = max(0, min(100, baseline_integrity - penalty))
         
         return {
             "fraud_score": round(float(score), 4),
             "verdict": verdict,
             "flags": flags,
-            "integrity_score": max(0, 100 + (score * 200)) # Simple mapping for 0-100 UI
+            "integrity_score": round(final_integrity, 2),
+            "timeline_valid": not any("gap" in f.lower() or "overlap" in f.lower() for f in flags)
         }

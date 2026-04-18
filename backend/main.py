@@ -150,8 +150,9 @@ async def analyze_resume(
         print(f"       Semantic score: {semantic_score}")
 
         # 7. Fraud Detection (20%)
-        print(f"[7/8] Running fraud detection...")
-        fraud_result = fraud_service.detect_fraud(full_text, list(resume_skills))
+        print(f"[7/8] Running advanced integrity & timeline detection...")
+        experience_data = parsed_data.get("extracted_fields", {}).get("experience", [])
+        fraud_result = fraud_service.detect_fraud(full_text, list(resume_skills), experience_data)
         integrity_score = float(fraud_result["integrity_score"])
 
         print(f"       Integrity score: {integrity_score}")
