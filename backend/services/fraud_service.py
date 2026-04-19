@@ -87,10 +87,71 @@ class FraudService:
         # Feature 4: Content richness
         richness = len(set(words)) / len(words) if words else 0
         
-        # Feature 5: Projects section (simplified here, in real app we'd check sections dict)
-        has_proj = 1 if "project" in text.lower() else 0
+    def has_projects_section(self, text: str) -> float:
+        """Returns 0 if projects section exists but is empty or says 'None'."""
+        tl = text.lower()
+        if "projects" in tl:
+            idx = tl.find("projects")
+            after = tl[idx:idx + 60]
+            if "none" in after or after.strip().endswith("projects"):
+                return 0.0
+        return 1.0
+
+    def extract_features(self, text: str, skills: List[str]) -> List[float]:
+        # Feature 0: Repetition score
+        rep_score = 1 - (len(set(skills)) / (len(skills) + 1)) if skills else 0
         
-        return [rep_score, word_rep, float(max_run), buzz_score, richness, float(has_proj)]
+        # Feature 1: Word repetition score
+        words = text.lower().split()
+        if not words: word_rep = 0
+        else:
+            counts = Counter(words)
+            stop = {"i","am","a","the","in","and","for","with","of","to","as","is",
+                    "my","have","has","at","on","an","by","be","are","was","were"}
+            repeated = sum(c - 1 for w, c in counts.items() if c > 1 and w not in stop)
+            word_rep = repeated / (len(words) + 1)
+            
+        # Feature 2: Consecutive word repeat
+        clean_words = [re.sub(r'[^a-z]', '', w) for w in text.lower().split()]
+        max_run, cur = 1, 1
+        for i in range(1, len(clean_words)):
+            if clean_words[i] and clean_words[i] == clean_words[i - 1]:
+                cur += 1
+                max_run = max(max_run, cur)
+            else: cur = 1
+            
+        # Feature 3: Buzzword score
+        buzzwords = [
+            "expert", "advanced", "proficient", "specialist", "experienced",
+            "highly", "everything", "all technologies", "best", "master",
+            "guru", "ninja", "rockstar", "wizard", "exceptional"
+        ]
+        buzz_count = sum(text.lower().count(w) for w in buzzwords)
+        buzz_score = buzz_count / (len(words) + 1)
+        
+        # Feature 4: Content richness
+        richness = len(set(words)) / len(words) if words else 0
+        
+        # Feature 5: Projects section
+        proj_score = self.has_projects_section(text)
+        
+        return [float(rep_score), float(word_rep), float(max_run), float(buzz_score), float(richness), float(proj_score)]
+
+    def experience_credibility_gap(self, text: str) -> float:
+        exp = re.search(r'(\d+)\s*years?', text.lower())
+        grad = re.search(r'(202\d|201\d)', text)
+        if exp and grad:
+            ey, gy = int(exp.group(1)), int(grad.group(1))
+            if gy >= 2018 and ey >= 5:
+                return min(ey / 5.0, 3.0)
+        return 0.0
+
+    def is_student_resume(self, text: str) -> bool:
+        indicators = ["student", "intern", "fresher", "cgpa", "pursuing", "present",
+                      "ongoing", "b.tech", "btech", "engineering student",
+                      "third-year", "second-year", "first-year"]
+        tl = text.lower()
+        return any(w in tl for w in indicators)
 
     def detect_fraud(self, text: str, skills: List[str]) -> Dict[str, Any]:
         features = self.extract_features(text, skills)
@@ -98,20 +159,71 @@ class FraudService:
         
         score = self.iso.decision_function(fs)[0]
         pred = self.iso.predict(fs)[0]
-        
         # Hard flags
         flags = []
-        if features[2] >= 3: flags.append("Suspicious word padding detected")
-        if features[3] > 0.08: flags.append("Excessive buzzword density")
-        if features[4] < 0.4: flags.append("Low content diversity (possible template abuse)")
+        rep    = features[0]
+        wrep   = features[1]
+        consec = features[2]
+        buzz   = features[3]
+        rich   = features[4]
+        proj   = features[5]
+        exp_gap = self.experience_credibility_gap(text)
+
+        if consec >= 3:
+            flags.append(f"Word repeated {int(consec)}x in a row — likely skill padding")
+        if exp_gap >= 2.0:
+            flags.append("Claims 10+ years experience but graduated recently — timeline impossible")
+        elif exp_gap >= 1.0:
+            flags.append("Experience years inconsistent with graduation year")
+        if buzz > 0.08:
+            flags.append("Excessive self-praise language (highly/expert/best overused)")
+        if proj == 0:
+            flags.append("Projects section is empty or says 'None'")
+        if wrep > 0.25:
+            flags.append("High word repetition in free text")
+            
+        n = len(flags)
         
-        verdict = "Normal"
-        if len(flags) >= 2 or score < -0.19: verdict = "High Risk"
-        elif len(flags) == 1 or score < -0.15: verdict = "Suspicious"
-        
+        # Interpret prediction
+        if n >= 2:
+            verdict = "🚨 High Risk Resume"
+        elif n == 1 and pred == -1:
+            verdict = "⚠️ Suspicious Resume"
+        elif pred == 1:
+            verdict = "✅ Normal Resume"
+        elif self.is_student_resume(text) and n == 0:
+            verdict = "✅ Normal Resume"
+        elif score < -0.19:
+            verdict = "🚨 High Risk Resume"
+        elif score < -0.165:
+            verdict = "⚠️ Suspicious Resume"
+        elif score < -0.13:
+            verdict = "🟡 Slight Anomaly"
+        else:
+            verdict = "✅ Normal Resume"
+            
+        # Explanations
+        reasons = list(flags)
+        if rep > 0.3 and not any("padding" in f for f in reasons):
+            reasons.append("Skill list contains many duplicate entries")
+        if rich < 0.5:
+            reasons.append("Very low vocabulary diversity")
+        if not reasons:
+            reasons.append("Resume looks normal" if score > -0.13 else "Resume deviates from normal patterns")
+
+        # UI Integrity constraint
+        if "High Risk" in verdict:
+            integrity = max(0, 100 + (score * 200) - 50)
+        elif "Suspicious" in verdict:
+            integrity = max(0, 100 + (score * 200) - 25)
+        elif "Anomaly" in verdict:
+            integrity = max(0, 100 + (score * 200) - 10)
+        else:
+            integrity = min(100, max(0, 100 + (score * 200)))
+
         return {
             "fraud_score": round(float(score), 4),
             "verdict": verdict,
-            "flags": flags,
-            "integrity_score": max(0, 100 + (score * 200)) # Simple mapping for 0-100 UI
+            "flags": reasons,
+            "integrity_score": round(integrity, 2)
         }
