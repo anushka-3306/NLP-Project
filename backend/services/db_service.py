@@ -1,3 +1,4 @@
+import json
 import psycopg2
 import psycopg2.extras
 import os
@@ -37,6 +38,15 @@ class DBService:
                         semantic_similarity FLOAT,
                         fraud_integrity FLOAT,
                         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                    )
+                """)
+                cur.execute("""
+                    CREATE TABLE IF NOT EXISTS skills (
+                        id SERIAL PRIMARY KEY,
+                        name TEXT UNIQUE,
+                        category TEXT,
+                        level TEXT,
+                        resources JSONB
                     )
                 """)
             conn.commit()
@@ -95,3 +105,36 @@ class DBService:
                     ORDER BY final_score DESC
                 """, (job_id,))
                 return cur.fetchall()
+    import json
+
+    def insert_skill(self, name, category, level, resources):
+        query = """
+        INSERT INTO skills (name, category, level, resources)
+        VALUES (%s, %s, %s, %s)
+        ON CONFLICT (name) DO NOTHING;
+        """
+
+        try:
+            with self.get_connection() as conn:
+                with conn.cursor() as cur:
+                    cur.execute(query, (name, category, level, json.dumps(resources)))
+                conn.commit()
+        except Exception as e:
+            print(f"Error inserting skill {name}: {e}")
+
+    import json
+
+    def get_skill(self, name):
+        query = "SELECT * FROM skills WHERE LOWER(name) = %s"
+
+        with self.get_connection() as conn:
+            with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
+                cur.execute(query, (name,))
+                result = cur.fetchone()
+
+                if result:
+                    # JSONB comes as dict already (usually), but safe handling:
+                    if isinstance(result["resources"], str):
+                        result["resources"] = json.loads(result["resources"])
+
+                return result

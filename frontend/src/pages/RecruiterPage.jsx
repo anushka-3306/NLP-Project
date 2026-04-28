@@ -304,9 +304,9 @@ export default function RecruiterPage() {
         {/* Inline create form */}
         {showForm && (
           <div style={{ marginBottom: 20, display: 'flex', flexDirection: 'column', gap: 10 }}>
-            <select
+            <input
               className="input-field"
-              placeholder="Job Title"
+              placeholder="Job Title..."
               value={newTitle}
               onChange={e => setNewTitle(e.target.value)}
               style={{
@@ -318,11 +318,8 @@ export default function RecruiterPage() {
                 outline: 'none'
               }}
             >
-              <option value="">Select Job Title</option>
-              {availablejobs.map((job, i) => (
-                <option key={i} value={job}>{job}</option>
-              ))}
-            </select>
+              
+            </input>
             <textarea
               className="input-field"
               placeholder="Job description…"

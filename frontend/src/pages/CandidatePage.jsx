@@ -570,9 +570,31 @@ export default function CandidatePage() {
                           <div className="text-sm text-[#191c1d] leading-relaxed">
                             <p className="font-semibold">{rec.skill}</p>
                             <ul className="list-disc ml-5 mt-1 space-y-1">
-                              {rec.resources?.map((r, idx) => (
-                                <li key={idx} className="break-words">{r}</li>
-                              ))}
+                              <ul className="list-disc ml-5 mt-1 space-y-1">
+  {rec.resources?.map(([title, link], idx) => (
+    <li key={idx} className="break-words">
+      <a
+  href={link}
+  target="_blank"
+  rel="noopener noreferrer"
+  className="flex items-center gap-1 text-purple-600 hover:underline"
+>
+  {title}
+
+  {/* 🔗 Small external link icon */}
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    className="w-3 h-3 opacity-70"
+    fill="none"
+    viewBox="0 0 24 24"
+    stroke="currentColor"
+  >
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 3h7m0 0v7m0-7L10 14" />
+  </svg>
+</a>
+    </li>
+  ))}
+</ul>
                             </ul>
                           </div>
                         </li>
@@ -592,6 +614,25 @@ export default function CandidatePage() {
                     Integrity Checks
                   </h3>
                   <div className="flex flex-col gap-4">
+                    {/* 🔥 Verdict */}
+<div className="flex justify-between items-center py-2 border-b border-[#edeeef]">
+  <span className="text-sm font-medium text-[#4c4451]">
+    Overall Risk Verdict
+  </span>
+
+  <span
+    className={`px-2 py-0.5 text-xs font-bold rounded-sm uppercase
+      ${
+        result.details.fraud_report?.verdict === "High Risk"
+          ? "bg-red-100 text-red-800"
+          : result.details.fraud_report?.verdict === "Suspicious"
+          ? "bg-yellow-100 text-yellow-800"
+          : "bg-green-100 text-green-800"
+      }`}
+  >
+    {result.details.fraud_report?.verdict}
+  </span>
+</div>
                     <div className="flex justify-between items-center py-2 border-b border-[#edeeef] flex-wrap gap-2">
                       <span className="text-sm font-medium text-[#4c4451]">Timeline Continuity</span>
                       <span className={`px-2 py-0.5 text-xs font-bold rounded-sm uppercase ${result.details.fraud_report?.timeline_valid === false ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800'}`}>
@@ -610,6 +651,31 @@ export default function CandidatePage() {
                         {result.details.fraud_report?.hidden_text ? 'Found' : 'Clean'}
                       </span>
                     </div>
+                    {/* 🔥 Dynamic Fraud Flags */}
+{result.details.fraud_report?.flags?.length > 0 && (
+  <div className="mt-4 border-t border-[#edeeef] pt-4">
+    <h4 className="text-sm font-semibold text-[#4c4451] mb-3">
+      Detected Issues
+    </h4>
+
+    <div className="flex flex-col">
+      {result.details.fraud_report.flags.map((flag, i) => (
+        <div
+          key={i}
+          className="flex justify-between items-center py-2 border-b border-[#edeeef] last:border-none"
+        >
+          <span className="text-sm text-[#4c4451] pr-4">
+            {flag}
+          </span>
+
+          <span className="px-2 py-0.5 text-xs font-bold rounded-sm bg-red-100 text-red-800 whitespace-nowrap">
+            FLAGGED
+          </span>
+        </div>
+      ))}
+    </div>
+  </div>
+)}
                   </div>
                 </div>
 
