@@ -16,7 +16,7 @@ function RankBadge({ rank }) {
     2: { bg: 'linear-gradient(135deg, #94a3b8, #64748b)', text: '#fff' },
     3: { bg: 'linear-gradient(135deg, #c2855e, #a16207)', text: '#fff' },
   };
-  const c = colors[rank] || { bg: 'var(--surface)', text: 'var(--text-muted)' };
+  const c = colors[rank] || { bg: '#e1e3e4', text: '#4c4451' };
   return (
     <div style={{
       width: 38,
@@ -36,13 +36,14 @@ function RankBadge({ rank }) {
     </div>
   );
 }
+
 const TIPS = [
   {
     title: 'AI Skill Matching',
     body: 'Our AI cross-references candidate skills against your job description for precise fit scoring.',
     svg: (
       <svg fill="none" stroke="url(#g1)" viewBox="0 0 24 24" style={{ width: 36, height: 36 }}>
-        <defs><linearGradient id="g1" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stopColor="#7c3aed"/><stop offset="100%" stopColor="#06b6d4"/></linearGradient></defs>
+        <defs><linearGradient id="g1" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stopColor="#2e0052" /><stop offset="100%" stopColor="#7c3aed" /></linearGradient></defs>
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
       </svg>
     )
@@ -52,7 +53,7 @@ const TIPS = [
     body: 'Beyond keywords — we understand context. A "software engineer" and "developer" are treated as equivalent.',
     svg: (
       <svg fill="none" stroke="url(#g2)" viewBox="0 0 24 24" style={{ width: 36, height: 36 }}>
-        <defs><linearGradient id="g2" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stopColor="#7c3aed"/><stop offset="100%" stopColor="#06b6d4"/></linearGradient></defs>
+        <defs><linearGradient id="g2" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stopColor="#2e0052" /><stop offset="100%" stopColor="#7c3aed" /></linearGradient></defs>
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
       </svg>
     )
@@ -62,7 +63,7 @@ const TIPS = [
     body: "Detects copy-pasted or AI-generated resumes to ensure you're seeing authentic candidates.",
     svg: (
       <svg fill="none" stroke="url(#g3)" viewBox="0 0 24 24" style={{ width: 36, height: 36 }}>
-        <defs><linearGradient id="g3" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stopColor="#7c3aed"/><stop offset="100%" stopColor="#06b6d4"/></linearGradient></defs>
+        <defs><linearGradient id="g3" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stopColor="#2e0052" /><stop offset="100%" stopColor="#7c3aed" /></linearGradient></defs>
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
       </svg>
     )
@@ -72,7 +73,7 @@ const TIPS = [
     body: 'Leaderboard updates instantly as new applications arrive — no refresh needed.',
     svg: (
       <svg fill="none" stroke="url(#g4)" viewBox="0 0 24 24" style={{ width: 36, height: 36 }}>
-        <defs><linearGradient id="g4" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stopColor="#7c3aed"/><stop offset="100%" stopColor="#06b6d4"/></linearGradient></defs>
+        <defs><linearGradient id="g4" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stopColor="#2e0052" /><stop offset="100%" stopColor="#7c3aed" /></linearGradient></defs>
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M13 10V3L4 14h7v7l9-11h-7z" />
       </svg>
     )
@@ -82,7 +83,7 @@ const TIPS = [
     body: 'Final score = weighted blend of Skill Match, Semantic Similarity, and Integrity — tuned for hiring accuracy.',
     svg: (
       <svg fill="none" stroke="url(#g5)" viewBox="0 0 24 24" style={{ width: 36, height: 36 }}>
-        <defs><linearGradient id="g5" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stopColor="#7c3aed"/><stop offset="100%" stopColor="#06b6d4"/></linearGradient></defs>
+        <defs><linearGradient id="g5" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stopColor="#2e0052" /><stop offset="100%" stopColor="#7c3aed" /></linearGradient></defs>
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
       </svg>
     )
@@ -105,12 +106,12 @@ function TipsCarousel() {
     }}>
       <div style={{
         position: 'absolute', top: 0, left: 0, right: 0, height: 3,
-        background: 'linear-gradient(90deg, #2e0052, #06b6d4)',
+        background: 'linear-gradient(90deg, #2e0052, #7c3aed)',
         borderRadius: '12px 12px 0 0'
       }} />
       <div style={{
         width: 64, height: 64, borderRadius: 16, marginBottom: 16,
-        background: 'linear-gradient(135deg, rgba(124,58,237,.08), rgba(6,182,212,.08))',
+        background: 'linear-gradient(135deg, rgba(46,0,82,.08), rgba(124,58,237,.08))',
         border: '1px solid rgba(124,58,237,.15)',
         display: 'flex', alignItems: 'center', justifyContent: 'center'
       }}>
@@ -119,20 +120,20 @@ function TipsCarousel() {
       <div style={{ fontFamily: 'Manrope', fontWeight: 800, fontSize: 18, color: '#111827', marginBottom: 8 }}>
         {tip.title}
       </div>
-      <div style={{ fontSize: 14, color: '#6b7280', maxWidth: 480, lineHeight: 1.6 }}>
+      <div style={{ fontSize: 14, color: '#4c4451', maxWidth: 480, lineHeight: 1.6 }}>
         {tip.body}
       </div>
       <div style={{ display: 'flex', gap: 6, marginTop: 24 }}>
         {TIPS.map((_, i) => (
           <div key={i} onClick={() => setActive(i)} style={{
             width: i === active ? 20 : 6, height: 6, borderRadius: 3,
-            background: i === active ? '#2e0052' : '#e5e7eb',
+            background: i === active ? '#2e0052' : '#e1e3e4',
             cursor: 'pointer', transition: 'all 0.3s ease'
           }} />
         ))}
       </div>
-      <div style={{ marginTop: 20, fontSize: 12, color: '#9ca3af', display: 'flex', alignItems: 'center', gap: 6 }}>
-        <svg fill="none" stroke="#9ca3af" viewBox="0 0 24 24" style={{ width: 13, height: 13 }}>
+      <div style={{ marginTop: 20, fontSize: 12, color: '#4c4451', display: 'flex', alignItems: 'center', gap: 6 }}>
+        <svg fill="none" stroke="#4c4451" viewBox="0 0 24 24" style={{ width: 13, height: 13 }}>
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5" />
         </svg>
         Select a job listing from the sidebar to view the AI-ranked leaderboard
@@ -140,6 +141,7 @@ function TipsCarousel() {
     </div>
   );
 }
+
 export default function RecruiterPage() {
   const [jobs, setJobs] = useState([]);
   const [selectedJob, setSelectedJob] = useState(null);
@@ -151,34 +153,36 @@ export default function RecruiterPage() {
   const [showForm, setShowForm] = useState(false);
   const [totalApplicants, setTotalApplicants] = useState(0);
   const [availablejobs, setAvailableJobs] = useState([]);
+
   useEffect(() => { fetchJobs(); }, []);
+
   const availableJobs = async () => {
     try {
       const r = await fetch('http://localhost:8000/jobs');
       setAvailableJobs(await r.json());
     } catch (e) { console.error(e); }
   }
+
   const fetchJobs = async () => {
-  try {
-    const r = await fetch('http://localhost:8000/api/jobs');
-    const jobsData = await r.json();
-    setJobs(jobsData);
+    try {
+      const r = await fetch('http://localhost:8000/api/jobs');
+      const jobsData = await r.json();
+      setJobs(jobsData);
 
-    // 🔥 Fetch applications count for all jobs
-    let total = 0;
+      // Fetch applications count for all jobs
+      let total = 0;
+      for (let job of jobsData) {
+        const res = await fetch(`http://localhost:8000/api/jobs/${job.id}/applications`);
+        const apps = await res.json();
+        total += apps.length;
+      }
+      setTotalApplicants(total);
 
-    for (let job of jobsData) {
-      const res = await fetch(`http://localhost:8000/api/jobs/${job.id}/applications`);
-      const apps = await res.json();
-      total += apps.length;
+    } catch (e) {
+      console.error(e);
     }
+  };
 
-    setTotalApplicants(total);
-
-  } catch (e) {
-    console.error(e);
-  }
-};
   const handleCreate = async () => {
     if (!newTitle.trim() || !newDesc.trim()) { setPostError('Both fields are required.'); return; }
     setIsPosting(true); setPostError('');
@@ -201,13 +205,15 @@ export default function RecruiterPage() {
       setApplications(await r.json());
     } catch (e) { console.error(e); }
   };
+
   useEffect(() => {
     if (showForm) {
       availableJobs();
     }
   }, [showForm]);
+
   return (
-    <div style={{ display: 'flex', minHeight: '100vh', background: '#f8f9fa' }}>
+    <div className="bg-background text-on-surface font-body min-h-screen flex antialiased bg-[#f8f9fa]">
 
       {/* ── Sidebar ── */}
       <aside className="sidebar" style={{
@@ -237,8 +243,8 @@ export default function RecruiterPage() {
             </svg>
           </div>
           <div className="sidebar-logo-text">
-            <div className="name" style={{ fontFamily: 'Manrope', fontWeight: 800, fontSize: 18,color: '#111827' }}>Aira</div>
-            <div className="sub" style={{ fontSize: 11, color: '#4b5563' }}>Recruiter Portal</div>
+            <div className="name" style={{ fontFamily: 'Manrope', fontWeight: 800, fontSize: 18, color: '#111827' }}>Aira</div>
+            <div className="sub" style={{ fontSize: 11, color: '#6b7280' }}>Recruiter Portal</div>
           </div>
         </div>
 
@@ -311,15 +317,14 @@ export default function RecruiterPage() {
               onChange={e => setNewTitle(e.target.value)}
               style={{
                 fontSize: 13,
-                color: '#111827',
+                color: '#191c1d',
                 padding: '10px 12px',
-                border: '1px solid #e5e7eb',
+                border: '1px solid #e1e3e4',
+                background: '#f8f9fa',
                 borderRadius: 6,
                 outline: 'none'
               }}
-            >
-              
-            </input>
+            />
             <textarea
               className="input-field"
               placeholder="Job description…"
@@ -329,10 +334,11 @@ export default function RecruiterPage() {
               style={{
                 resize: 'vertical',
                 fontSize: 13,
-                color: '#111827',
+                color: '#191c1d',
                 lineHeight: 1.5,
                 padding: '10px 12px',
-                border: '1px solid #e5e7eb',
+                border: '1px solid #e1e3e4',
+                background: '#f8f9fa',
                 borderRadius: 6,
                 outline: 'none',
                 fontFamily: 'inherit'
@@ -365,24 +371,23 @@ export default function RecruiterPage() {
         )}
 
         {/* Job list */}
-        <div style={{ fontSize: 11, fontWeight: 700, color: '#111827', textTransform: 'uppercase', letterSpacing: '.08em', marginBottom: 10 }}>
+        <div style={{ fontSize: 11, fontWeight: 700, color: '#4c4451', textTransform: 'uppercase', letterSpacing: '.08em', marginBottom: 10 }}>
           Active Listings ({jobs.length})
         </div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8, overflowY: 'auto', flex: 1 }}>
           {jobs.length === 0 ? (
-            <p style={{ fontSize: 13, color: 'black', padding: '12px 0' }}>No jobs yet.</p>
+            <p style={{ fontSize: 13, color: '#4c4451', padding: '12px 0' }}>No jobs yet.</p>
           ) : jobs.map(job => (
             <div key={job.id} className={`job-card ${selectedJob?.id === job.id ? 'active' : ''}`} onClick={() => selectJob(job)} style={{
               padding: '12px',
               borderRadius: 8,
               cursor: 'pointer',
               transition: 'all 0.2s',
-              
-              background: selectedJob?.id === job.id ? '#f3f4f6' : 'transparent',
-              border: selectedJob?.id === job.id ? '1px solid #e5e7eb' : '1px solid transparent'
+              background: selectedJob?.id === job.id ? '#f3f4f5' : 'transparent',
+              border: selectedJob?.id === job.id ? '1px solid #e1e3e4' : '1px solid transparent'
             }}>
-              <div className="title" style={{ fontWeight: 600, fontSize: 14, marginBottom: 4, wordBreak: 'break-word',color: '#111827' }}>{job.title}</div>
-              <div className="desc" style={{ fontSize: 12, color: '#4b5563', overflow: 'hidden', textOverflow: 'ellipsis', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', wordBreak: 'break-word' }}>{job.description}</div>
+              <div className="title" style={{ fontWeight: 600, fontSize: 14, marginBottom: 4, wordBreak: 'break-word', color: '#111827' }}>{job.title}</div>
+              <div className="desc" style={{ fontSize: 12, color: '#4c4451', overflow: 'hidden', textOverflow: 'ellipsis', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', wordBreak: 'break-word' }}>{job.description}</div>
             </div>
           ))}
         </div>
@@ -395,9 +400,9 @@ export default function RecruiterPage() {
             gap: 8,
             padding: '10px 12px',
             borderRadius: 8,
-            background: 'rgba(6,182,212,.08)',
-            border: '1px solid rgba(6,182,212,.2)',
-            color: '#0891b2',
+            background: 'rgba(46,0,82,.08)',
+            border: '1px solid rgba(46,0,82,.2)',
+            color: '#2e0052',
             textDecoration: 'none',
             fontSize: 14
           }}>
@@ -410,21 +415,22 @@ export default function RecruiterPage() {
       </aside>
 
       {/* ── Main Content ── */}
-      <main className="main-content" style={{ flex: 1, padding: '32px 40px', overflowX: 'auto' }}>
+      <main className="main-content" style={{ flex: 1, padding: '32px 40px', overflowX: 'auto', background: '#f8f9fa' }}>
         {!selectedJob ? (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 32, maxWidth: 1200 }}>
             <div className="fade-up">
-<h1 style={{ fontFamily: 'Manrope', fontWeight: 900, fontSize: 'clamp(24px, 5vw, 34px)', margin: '0 0 8px', letterSpacing: '-1px', wordBreak: 'break-word', color: '#111827' }}>Recruiter Dashboard</h1>              <p style={{ color: '#4b5563', fontSize: 15, margin: 0 }}>Create job postings and review AI-graded applicants ranked by overall fit.</p>
+              <h1 style={{ fontFamily: 'Manrope', fontWeight: 900, fontSize: 'clamp(24px, 5vw, 34px)', margin: '0 0 8px', letterSpacing: '-1px', wordBreak: 'break-word', color: '#191c1d' }}>Recruiter Dashboard</h1>
+              <p style={{ color: '#4c4451', fontSize: 15, margin: 0 }}>Create job postings and review AI-graded applicants ranked by overall fit.</p>
             </div>
 
             {/* Stats Row */}
             <div className="fade-up-d1" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 16 }}>
               {[
-                { icon: 'work', label: 'Active Postings', value: jobs.length, color: '124,58,237' },
-                { icon: 'group', label: 'Total Applicants', value: totalApplicants, color: '6,182,212' },
+                { icon: 'work', label: 'Active Postings', value: jobs.length, color: '46,0,82' },
+                { icon: 'group', label: 'Total Applicants', value: totalApplicants, color: '124,58,237' },
                 { icon: 'speed', label: 'Avg Turnaround', value: '< 30s', color: '16,185,129' },
               ].map(({ icon, label, value, color }, i) => (
-                <div key={i} className="card fade-up" style={{ padding: '24px', display: 'flex', alignItems: 'center', gap: 16, background: '#fff', borderRadius: 12, border: '1px solid #e5e7eb' }}>
+                <div key={i} className="card fade-up" style={{ padding: '24px', display: 'flex', alignItems: 'center', gap: 16, background: '#fff', borderRadius: 12, border: '1px solid #e1e3e4', boxShadow: '0 4px 20px rgba(46,0,82,0.02)' }}>
                   <div style={{ width: 48, height: 48, borderRadius: 14, flexShrink: 0, background: `rgba(${color},.12)`, border: `1px solid rgba(${color},.2)`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                     <svg className="w-6 h-6" fill="none" stroke={`rgb(${color})`} viewBox="0 0 24 24" style={{ width: 22, height: 22 }}>
                       {icon === 'work' && <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />}
@@ -434,24 +440,16 @@ export default function RecruiterPage() {
                   </div>
                   <div>
                     <div style={{ fontFamily: 'Manrope', fontWeight: 800, fontSize: 28, color: `rgb(${color})` }}>{value}</div>
-                    <div style={{ fontSize: 13, color: '#4b5563', marginTop: 2 }}>{label}</div>
+                    <div style={{ fontSize: 13, color: '#4c4451', marginTop: 2 }}>{label}</div>
                   </div>
                 </div>
               ))}
             </div>
 
-            {/* Replace this entire div: */}
-
-
-{/* With this: */}
-<div className="fade-up-d2" style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-
-
- 
-  {/* Tips Carousel */}
-  <TipsCarousel />
-
-</div>
+            <div className="fade-up-d2" style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+              {/* Tips Carousel */}
+              <TipsCarousel />
+            </div>
           </div>
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 28, maxWidth: '100%', overflowX: 'auto' }}>
@@ -476,15 +474,16 @@ export default function RecruiterPage() {
                   </svg>
                   All Jobs
                 </button>
-<h1 style={{ fontFamily: 'Manrope', fontWeight: 900, fontSize: 'clamp(24px, 5vw, 30px)', margin: '0 0 6px', letterSpacing: '-1px', wordBreak: 'break-word', color: '#111827' }}>{selectedJob.title}</h1>                <p style={{ fontSize: 13, color: '#4b5563', margin: 0 }}>
+                <h1 style={{ fontFamily: 'Manrope', fontWeight: 900, fontSize: 'clamp(24px, 5vw, 30px)', margin: '0 0 6px', letterSpacing: '-1px', wordBreak: 'break-word', color: '#191c1d' }}>{selectedJob.title}</h1>
+                <p style={{ fontSize: 13, color: '#4c4451', margin: 0 }}>
                   {applications.length} applicant{applications.length !== 1 ? 's' : ''} · ranked by AI score
                 </p>
               </div>
-              <div style={{ background: 'rgba(6,182,212,.08)', border: '1px solid rgba(6,182,212,.2)', borderRadius: 12, padding: '12px 18px', fontSize: 13 }}>
-                <svg className="w-4 h-4" fill="none" stroke="#0891b2" viewBox="0 0 24 24" style={{ width: 15, height: 15, display: 'inline', verticalAlign: 'middle', marginRight: 6 }}>
+              <div style={{ background: 'rgba(46,0,82,.08)', border: '1px solid rgba(46,0,82,.2)', borderRadius: 12, padding: '12px 18px', fontSize: 13 }}>
+                <svg className="w-4 h-4" fill="none" stroke="#2e0052" viewBox="0 0 24 24" style={{ width: 15, height: 15, display: 'inline', verticalAlign: 'middle', marginRight: 6 }}>
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
-                <span style={{ color: '#0891b2' }}>Scores auto-update as new applications arrive</span>
+                <span style={{ color: '#2e0052', fontWeight: 600 }}>Scores auto-update as new applications arrive</span>
               </div>
             </div>
 
@@ -495,13 +494,14 @@ export default function RecruiterPage() {
                 padding: '60px 20px',
                 background: '#fff',
                 borderRadius: 12,
-                border: '1px solid #e5e7eb'
+                border: '1px solid #e1e3e4',
+                boxShadow: '0 4px 20px rgba(46,0,82,0.02)'
               }}>
-                <svg className="w-12 h-12 mx-auto mb-4" fill="none" stroke="#4b5563" viewBox="0 0 24 24" style={{ width: 48, height: 48, margin: '0 auto 16px', color: '#9ca3af' }}>
+                <svg className="w-12 h-12 mx-auto mb-4" fill="none" stroke="#4c4451" viewBox="0 0 24 24" style={{ width: 48, height: 48, margin: '0 auto 16px', color: '#9ca3af' }}>
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
                 </svg>
-                <p style={{ fontFamily: 'Manrope', fontWeight: 700, fontSize: 16, margin: '0 0 4px' }}>No applications yet</p>
-                <p style={{ fontSize: 13, color: '#4b5563', margin: '0 0 12px' }}>Share the Candidate Portal link to start receiving applications.</p>
+                <p style={{ fontFamily: 'Manrope', fontWeight: 700, fontSize: 16, margin: '0 0 4px', color: '#191c1d' }}>No applications yet</p>
+                <p style={{ fontSize: 13, color: '#4c4451', margin: '0 0 12px' }}>Share the Candidate Portal link to start receiving applications.</p>
                 <Link to="/candidate" className="btn btn-ghost" style={{
                   fontSize: 13,
                   padding: '8px 16px',
@@ -531,10 +531,10 @@ export default function RecruiterPage() {
                   padding: '0 20px 12px 20px',
                   fontSize: 11,
                   fontWeight: 700,
-                  color: '#4b5563',
+                  color: '#4c4451',
                   textTransform: 'uppercase',
                   letterSpacing: '.07em',
-                  borderBottom: '1px solid #e5e7eb',
+                  borderBottom: '1px solid #e1e3e4',
                   minWidth: 800
                 }}>
                   <span>#</span>
@@ -565,23 +565,23 @@ export default function RecruiterPage() {
                     <div style={{ display: 'flex', alignItems: 'center', gap: 14, minWidth: 0 }}>
                       <img
                         alt={app.candidate_name}
-                        src={`https://ui-avatars.com/api/?name=${encodeURIComponent(app.candidate_name)}&background=3b0764&color=c4b5fd&size=80`}
-                        style={{ width: 40, height: 40, borderRadius: '50%', flexShrink: 0, border: '1px solid #e5e7eb' }}
+                        src={`https://ui-avatars.com/api/?name=${encodeURIComponent(app.candidate_name)}&background=e7e8e9&color=2e0052&size=80`}
+                        style={{ width: 40, height: 40, borderRadius: '50%', flexShrink: 0, border: '1px solid #e1e3e4' }}
                       />
                       <div style={{ overflow: 'hidden' }}>
-                        <div style={{ fontWeight: 700, fontSize: 15, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',color: '#111827' }}>{app.candidate_name}</div>
-                        <div style={{ fontSize: 12, color: '#4b5563', marginTop: 2 }}>Applied via Aira Portal</div>
+                        <div style={{ fontWeight: 700, fontSize: 15, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', color: '#191c1d' }}>{app.candidate_name}</div>
+                        <div style={{ fontSize: 12, color: '#4c4451', marginTop: 2 }}>Applied via Aira Portal</div>
                       </div>
                     </div>
 
                     <div style={{ display: 'flex', gap: 32, alignItems: 'center', justifySelf: 'end' }}>
-                      <StatPill label="Skill" value={app.skill_match} color="#a78bfa" />
-                      <StatPill label="Semantic" value={app.semantic_similarity} color="#67e8f9" />
-                      <StatPill label="Integrity" value={app.fraud_integrity} color="#6ee7b7" />
+                      <StatPill label="Skill" value={app.skill_match} color="#7c3aed" />
+                      <StatPill label="Semantic" value={app.semantic_similarity} color="#a855f7" />
+                      <StatPill label="Integrity" value={app.fraud_integrity} color="#10b981" />
                     </div>
 
                     <div style={{ textAlign: 'center', flexShrink: 0 }}>
-                      <div style={{ fontFamily: 'Manrope', fontWeight: 900, fontSize: 28, background: 'linear-gradient(135deg, #a78bfa, #06b6d4)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', letterSpacing: '-1px' }}>
+                      <div style={{ fontFamily: 'Manrope', fontWeight: 900, fontSize: 28, background: 'linear-gradient(135deg, #2e0052, #7c3aed)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', letterSpacing: '-1px' }}>
                         {app.final_score}%
                       </div>
                     </div>

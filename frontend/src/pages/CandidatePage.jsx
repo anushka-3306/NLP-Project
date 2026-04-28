@@ -169,7 +169,7 @@ export default function CandidatePage() {
             </svg>
           </div>
           <div className="sidebar-logo-text">
-            <div className="name" style={{ fontFamily: 'Manrope', fontWeight: 800, fontSize: 18 ,color: '#111827'}}>Aira</div>
+            <div className="name" style={{ fontFamily: 'Manrope', fontWeight: 800, fontSize: 18, color: '#111827' }}>Aira</div>
             <div className="sub" style={{ fontSize: 11, color: '#6b7280' }}>Candidate Portal</div>
           </div>
         </div>
@@ -262,7 +262,7 @@ export default function CandidatePage() {
                     if (job) setSelectedJob(job);
                   }}
                 >
-                  <div style={{ fontWeight: 600, fontSize: 13, marginBottom: 6, wordBreak: 'break-word',color: '#111827' }}>
+                  <div style={{ fontWeight: 600, fontSize: 13, marginBottom: 6, wordBreak: 'break-word', color: '#111827' }}>
                     {app.job_title}
                   </div>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
@@ -351,8 +351,8 @@ export default function CandidatePage() {
                 </svg>
               </div>
               <h3 className="font-['Manrope'] font-bold text-lg mb-2 break-all max-w-full text-gray-900">
-  {file ? file.name : "Drag & Drop Resume"}
-</h3>
+                {file ? file.name : "Drag & Drop Resume"}
+              </h3>
               <p className="text-[#4c4451] text-sm mb-6">
                 {file ? `${(file.size / 1024 / 1024).toFixed(2)} MB` : "Supports PDF, DOCX (Max 10MB)"}
               </p>
@@ -504,6 +504,83 @@ export default function CandidatePage() {
               </div>
             </div>
 
+            {/* Best Job Match Card */}
+            {result.job_prediction && (
+              <div className="bg-white p-6 md:p-8 rounded-xl shadow-[0_4px_20px_rgb(46,0,82,0.04)] flex flex-col sm:flex-row items-start sm:items-center gap-6 relative overflow-hidden border border-[#f0e6ff]">
+                {/* Decorative orb */}
+                <div style={{
+                  position: 'absolute', right: 0, top: 0,
+                  width: 200, height: 200,
+                  borderRadius: '50%',
+                  background: 'radial-gradient(circle, rgba(124,58,237,0.08) 0%, transparent 70%)',
+                  transform: 'translate(30%, -30%)',
+                  pointerEvents: 'none'
+                }} />
+
+                {/* Icon */}
+                <div style={{
+                  width: 56, height: 56, borderRadius: 16, flexShrink: 0,
+                  background: 'linear-gradient(135deg, #2e0052, #7c3aed)',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  boxShadow: '0 8px 20px rgba(46,0,82,0.2)'
+                }}>
+                  <svg width="26" height="26" fill="none" stroke="white" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5}
+                      d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                  </svg>
+                </div>
+
+                {/* Text */}
+                <div className="flex-1 z-10">
+                  <div style={{ fontSize: 11, fontWeight: 700, color: '#6b7280', textTransform: 'uppercase', letterSpacing: '.1em', marginBottom: 6 }}>
+                    AI Career Match · TF-IDF + Logistic Regression
+                  </div>
+                  {result.job_prediction.low_confidence ? (
+                    <div>
+                      <div style={{ fontFamily: 'Manrope', fontWeight: 800, fontSize: 22, color: '#374151' }}>
+                        Low Confidence Prediction
+                      </div>
+                      <p style={{ fontSize: 13, color: '#6b7280', marginTop: 4 }}>
+                        The model could not confidently classify this resume into a known category (confidence: {(result.job_prediction.confidence * 100).toFixed(1)}%).
+                        This may indicate a highly specialised or mixed-domain profile.
+                      </p>
+                    </div>
+                  ) : (
+                    <div>
+                      <div style={{ fontFamily: 'Manrope', fontWeight: 800, fontSize: 26, color: '#2e0052' }}>
+                        {result.job_prediction.predicted_category}
+                      </div>
+                      <p style={{ fontSize: 13, color: '#6b7280', marginTop: 4 }}>
+                        Based on your resume content, our classifier recommends roles in{' '}
+                        <strong style={{ color: '#4b0082' }}>{result.job_prediction.predicted_category}</strong>.
+                        Confidence: <strong>{(result.job_prediction.confidence * 100).toFixed(1)}%</strong>.
+                      </p>
+                    </div>
+                  )}
+                </div>
+
+                {/* Confidence Badge */}
+                {!result.job_prediction.low_confidence && (
+                  <div style={{ textAlign: 'center', flexShrink: 0, zIndex: 10 }}>
+                    <div style={{
+                      width: 72, height: 72, borderRadius: '50%',
+                      border: '4px solid #f0e6ff',
+                      background: 'linear-gradient(135deg, rgba(46,0,82,0.05), rgba(124,58,237,0.08))',
+                      display: 'flex', flexDirection: 'column',
+                      alignItems: 'center', justifyContent: 'center'
+                    }}>
+                      <div style={{ fontFamily: 'Manrope', fontWeight: 900, fontSize: 16, color: '#2e0052', lineHeight: 1 }}>
+                        {(result.job_prediction.confidence * 100).toFixed(0)}%
+                      </div>
+                      <div style={{ fontSize: 9, color: '#7c3aed', fontWeight: 700, letterSpacing: '.05em', textTransform: 'uppercase', marginTop: 2 }}>
+                        match
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+
             {/* Detailed Analysis Layout */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
 
@@ -571,30 +648,30 @@ export default function CandidatePage() {
                             <p className="font-semibold">{rec.skill}</p>
                             <ul className="list-disc ml-5 mt-1 space-y-1">
                               <ul className="list-disc ml-5 mt-1 space-y-1">
-  {rec.resources?.map(([title, link], idx) => (
-    <li key={idx} className="break-words">
-      <a
-  href={link}
-  target="_blank"
-  rel="noopener noreferrer"
-  className="flex items-center gap-1 text-purple-600 hover:underline"
->
-  {title}
+                                {rec.resources?.map(([title, link], idx) => (
+                                  <li key={idx} className="break-words">
+                                    <a
+                                      href={link}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      className="flex items-center gap-1 text-purple-600 hover:underline"
+                                    >
+                                      {title}
 
-  {/* 🔗 Small external link icon */}
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    className="w-3 h-3 opacity-70"
-    fill="none"
-    viewBox="0 0 24 24"
-    stroke="currentColor"
-  >
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 3h7m0 0v7m0-7L10 14" />
-  </svg>
-</a>
-    </li>
-  ))}
-</ul>
+                                      {/* 🔗 Small external link icon */}
+                                      <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        className="w-3 h-3 opacity-70"
+                                        fill="none"
+                                        viewBox="0 0 24 24"
+                                        stroke="currentColor"
+                                      >
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 3h7m0 0v7m0-7L10 14" />
+                                      </svg>
+                                    </a>
+                                  </li>
+                                ))}
+                              </ul>
                             </ul>
                           </div>
                         </li>
@@ -615,24 +692,23 @@ export default function CandidatePage() {
                   </h3>
                   <div className="flex flex-col gap-4">
                     {/* 🔥 Verdict */}
-<div className="flex justify-between items-center py-2 border-b border-[#edeeef]">
-  <span className="text-sm font-medium text-[#4c4451]">
-    Overall Risk Verdict
-  </span>
+                    <div className="flex justify-between items-center py-2 border-b border-[#edeeef]">
+                      <span className="text-sm font-medium text-[#4c4451]">
+                        Overall Risk Verdict
+                      </span>
 
-  <span
-    className={`px-2 py-0.5 text-xs font-bold rounded-sm uppercase
-      ${
-        result.details.fraud_report?.verdict === "High Risk"
-          ? "bg-red-100 text-red-800"
-          : result.details.fraud_report?.verdict === "Suspicious"
-          ? "bg-yellow-100 text-yellow-800"
-          : "bg-green-100 text-green-800"
-      }`}
-  >
-    {result.details.fraud_report?.verdict}
-  </span>
-</div>
+                      <span
+                        className={`px-2 py-0.5 text-xs font-bold rounded-sm uppercase
+      ${result.details.fraud_report?.verdict === "High Risk"
+                            ? "bg-red-100 text-red-800"
+                            : result.details.fraud_report?.verdict === "Suspicious"
+                              ? "bg-yellow-100 text-yellow-800"
+                              : "bg-green-100 text-green-800"
+                          }`}
+                      >
+                        {result.details.fraud_report?.verdict}
+                      </span>
+                    </div>
                     <div className="flex justify-between items-center py-2 border-b border-[#edeeef] flex-wrap gap-2">
                       <span className="text-sm font-medium text-[#4c4451]">Timeline Continuity</span>
                       <span className={`px-2 py-0.5 text-xs font-bold rounded-sm uppercase ${result.details.fraud_report?.timeline_valid === false ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800'}`}>
@@ -652,30 +728,30 @@ export default function CandidatePage() {
                       </span>
                     </div>
                     {/* 🔥 Dynamic Fraud Flags */}
-{result.details.fraud_report?.flags?.length > 0 && (
-  <div className="mt-4 border-t border-[#edeeef] pt-4">
-    <h4 className="text-sm font-semibold text-[#4c4451] mb-3">
-      Detected Issues
-    </h4>
+                    {result.details.fraud_report?.flags?.length > 0 && (
+                      <div className="mt-4 border-t border-[#edeeef] pt-4">
+                        <h4 className="text-sm font-semibold text-[#4c4451] mb-3">
+                          Detected Issues
+                        </h4>
 
-    <div className="flex flex-col">
-      {result.details.fraud_report.flags.map((flag, i) => (
-        <div
-          key={i}
-          className="flex justify-between items-center py-2 border-b border-[#edeeef] last:border-none"
-        >
-          <span className="text-sm text-[#4c4451] pr-4">
-            {flag}
-          </span>
+                        <div className="flex flex-col">
+                          {result.details.fraud_report.flags.map((flag, i) => (
+                            <div
+                              key={i}
+                              className="flex justify-between items-center py-2 border-b border-[#edeeef] last:border-none"
+                            >
+                              <span className="text-sm text-[#4c4451] pr-4">
+                                {flag}
+                              </span>
 
-          <span className="px-2 py-0.5 text-xs font-bold rounded-sm bg-red-100 text-red-800 whitespace-nowrap">
-            FLAGGED
-          </span>
-        </div>
-      ))}
-    </div>
-  </div>
-)}
+                              <span className="px-2 py-0.5 text-xs font-bold rounded-sm bg-red-100 text-red-800 whitespace-nowrap">
+                                FLAGGED
+                              </span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </div>
 
