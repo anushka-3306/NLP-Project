@@ -11,3 +11,4 @@ joblib
 FlagEmbedding
 torch
 transformers
+nltk

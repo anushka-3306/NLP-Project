@@ -16,7 +16,6 @@ class SimilarityService:
         return [c.strip().replace('\n', ' ') for c in chunks if len(c.strip()) > 15]
 
     def compute_similarity(self, jd_text: str, resume_text: str) -> Dict[str, Any]:
-        print("\n" + "="*60)
         print("=== SIMILARITY SERVICE DEBUG ===")
         print(f"JD text length: {len(jd_text)}")
         print(f"Resume text length: {len(resume_text)}")

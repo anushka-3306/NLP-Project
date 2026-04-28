@@ -11,6 +11,7 @@ from services.ner_service import NERService
 from services.similarity_service import SimilarityService
 from services.fraud_service import FraudService
 from services.recommendation_service import RecommendationService
+from services.job_match_service import JobMatchService
 from services.db_service import DBService
 
 app = FastAPI(title="Aira ATS API")
@@ -30,6 +31,7 @@ similarity_service = SimilarityService()
 fraud_service = FraudService()
 rec_service = RecommendationService()
 db_service = DBService()
+job_match_service = JobMatchService()
 
 # For NER, we need a skill list. Let's get all skills from Graph once.
 # In a real app, this would be cached or reactive.
@@ -176,6 +178,10 @@ async def analyze_resume(
         # 9. Recommendations for missing skills
         recommendations = rec_service.get_recommendations(missing_skills)
         print(f"       Recommendations: {recommendations}")
+
+        # 10. Best-fit job category prediction (TF-IDF + Logistic Regression)
+        job_prediction = job_match_service.predict(full_text)
+        print(f"       Job prediction: {job_prediction}")
         print("### RESPONSE SENT ###\n")
 
         return {
@@ -192,7 +198,8 @@ async def analyze_resume(
                 "fraud_report": fraud_result,
                 "similarity_report": sim_result["details"]
             },
-            "recommendations": recommendations
+            "recommendations": recommendations,
+            "job_prediction": job_prediction
         }
 
     except Exception as e:
