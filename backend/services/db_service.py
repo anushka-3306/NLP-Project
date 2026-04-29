@@ -2,6 +2,8 @@ import json
 import psycopg2
 import psycopg2.extras
 import os
+import json
+from typing import List
 
 class DBService:
     def __init__(self):
@@ -37,6 +39,8 @@ class DBService:
                         skill_match FLOAT,
                         semantic_similarity FLOAT,
                         fraud_integrity FLOAT,
+                        resume_path VARCHAR(512),
+                        details JSONB,
                         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
                     )
                 """)
@@ -72,6 +76,24 @@ class DBService:
                 cur.execute("SELECT * FROM jobs WHERE id = %s", (job_id,))
                 return cur.fetchone()
 
+    def update_job(self, job_id: int, title: str, description: str):
+        with self.get_connection() as conn:
+            with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
+                cur.execute(
+                    "UPDATE jobs SET title = %s, description = %s WHERE id = %s RETURNING *",
+                    (title, description, job_id)
+                )
+                return cur.fetchone()
+
+    def delete_job(self, job_id: int):
+        with self.get_connection() as conn:
+            with conn.cursor() as cur:
+                # First delete applications for this job
+                cur.execute("DELETE FROM applications WHERE job_id = %s", (job_id,))
+                cur.execute("DELETE FROM jobs WHERE id = %s", (job_id,))
+            conn.commit()
+            return True
+
     def create_application(
         self,
         job_id: int,
@@ -79,7 +101,9 @@ class DBService:
         final_score,
         skill_match,
         semantic_similarity,
-        fraud_integrity
+        fraud_integrity,
+        resume_path: str = None,
+        details: dict = None
     ):
         # ✅ Normalize all numeric values
         final_score = float(final_score)
@@ -91,9 +115,9 @@ class DBService:
             with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
                 cur.execute("""
                     INSERT INTO applications 
-                    (job_id, candidate_name, final_score, skill_match, semantic_similarity, fraud_integrity)
-                    VALUES (%s, %s, %s, %s, %s, %s) RETURNING *
-                """, (job_id, candidate_name, final_score, skill_match, semantic_similarity, fraud_integrity))
+                    (job_id, candidate_name, final_score, skill_match, semantic_similarity, fraud_integrity, resume_path, details)
+                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s) RETURNING *
+                """, (job_id, candidate_name, final_score, skill_match, semantic_similarity, fraud_integrity, resume_path, json.dumps(details)))
                 return cur.fetchone()
 
     def get_applications_for_job(self, job_id: int):
@@ -105,6 +129,7 @@ class DBService:
                     ORDER BY final_score DESC
                 """, (job_id,))
                 return cur.fetchall()
+
     import json
 
     def insert_skill(self, name, category, level, resources):
@@ -122,7 +147,7 @@ class DBService:
         except Exception as e:
             print(f"Error inserting skill {name}: {e}")
 
-    import json
+    # import json -> Already imported above
 
     def get_skill(self, name):
         query = "SELECT * FROM skills WHERE LOWER(name) = %s"
@@ -138,3 +163,18 @@ class DBService:
                         result["resources"] = json.loads(result["resources"])
 
                 return result
+
+    def get_applications_by_ids(self, app_ids: List[int]):
+        if not app_ids:
+            return []
+        with self.get_connection() as conn:
+            with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
+                cur.execute("SELECT * FROM applications WHERE id = ANY(%s)", (app_ids,))
+                return cur.fetchall()
+
+    def delete_application(self, app_id: int):
+        with self.get_connection() as conn:
+            with conn.cursor() as cur:
+                cur.execute("DELETE FROM applications WHERE id = %s", (app_id,))
+            conn.commit()
+            return True

@@ -2,249 +2,65 @@ import React from 'react';
 import { BrowserRouter, Routes, Route, Link } from 'react-router-dom';
 import CandidatePage from './pages/CandidatePage';
 import RecruiterPage from './pages/RecruiterPage';
+import ThemeToggle from './components/ThemeToggle';
 
 function LandingPage() {
   return (
-    <div style={{
-      minHeight: '100vh',
-      display: 'flex',
-      flexDirection: 'column',
-      alignItems: 'center',
-      justifyContent: 'center',
-      position: 'relative',
-      overflow: 'hidden',
-      background: '#f8f9fa'
-    }}>
-
-      {/* Background orbs */}
-      <div style={{
-        position: 'absolute',
-        width: 600,
-        height: 600,
-        borderRadius: '50%',
-        background: 'radial-gradient(circle, rgba(124,58,237,0.15) 0%, transparent 70%)',
-        top: '50%',
-        left: '50%',
-        transform: 'translate(-50%, -50%)',
-        pointerEvents: 'none'
-      }} />
-      <div style={{
-        position: 'absolute',
-        width: 300,
-        height: 300,
-        borderRadius: '50%',
-        background: 'radial-gradient(circle, rgba(6,182,212,0.1) 0%, transparent 70%)',
-        top: '20%',
-        right: '15%',
-        pointerEvents: 'none'
-      }} />
-      <div style={{
-        position: 'absolute',
-        width: 400,
-        height: 400,
-        borderRadius: '50%',
-        background: 'radial-gradient(circle, rgba(46,0,82,0.08) 0%, transparent 70%)',
-        bottom: '10%',
-        left: '10%',
-        pointerEvents: 'none'
-      }} />
-      <div style={{
-        position: 'absolute',
-        inset: 0,
-        backgroundImage: 'radial-gradient(rgba(0,0,0,0.03) 1px, transparent 1px)',
-        backgroundSize: '32px 32px',
-        pointerEvents: 'none'
-      }} />
-
-      <div className="fade-up" style={{
-        textAlign: 'center',
-        zIndex: 10,
-        maxWidth: 560,
-        padding: '0 24px',
-        animation: 'fadeUp 0.6s ease-out'
-      }}>
-        {/* Logo */}
-        <div style={{
-          width: 80,
-          height: 80,
-          borderRadius: 24,
-          background: 'linear-gradient(135deg, #2e0052, #4b0082)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          margin: '0 auto 32px',
-          boxShadow: '0 20px 40px rgba(46,0,82,0.3)'
-        }}>
-          <svg className="w-10 h-10" fill="none" stroke="white" viewBox="0 0 24 24" style={{ width: 40, height: 40 }}>
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-          </svg>
+    <div className="min-h-screen bg-[var(--bg-app)] transition-colors duration-200 flex flex-col font-['Inter']">
+      
+      {/* Navbar */}
+      <nav className="w-full flex items-center justify-between px-6 py-4 border-b border-slate-200 dark:border-slate-800 bg-[var(--bg-card)]/80 backdrop-blur-md sticky top-0 z-50">
+        <div className="flex items-center gap-2">
+          <div className="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center">
+            <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+            </svg>
+          </div>
+          <span className="font-bold text-lg text-slate-900 dark:text-white font-['Manrope'] tracking-tight">Aira</span>
         </div>
+        <ThemeToggle />
+      </nav>
 
-        <h1 style={{
-          fontFamily: 'Manrope, system-ui, -apple-system, sans-serif',
-          fontWeight: 900,
-          fontSize: 'clamp(40px, 8vw, 56px)',
-          lineHeight: 1.05,
-          letterSpacing: '-2px',
-          margin: '0 0 16px',
-          background: 'linear-gradient(135deg, #2e0052, #7c3aed, #06b6d4)',
-          WebkitBackgroundClip: 'text',
-          WebkitTextFillColor: 'transparent',
-          backgroundClip: 'text'
-        }}>
-          Aira Intelligence
+      {/* Main Content */}
+      <div className="flex-1 flex flex-col items-center justify-center px-6 fade-up">
+        <h1 className="text-4xl md:text-5xl font-black text-center mb-4 font-['Manrope'] tracking-tight text-slate-900 dark:text-white max-w-[800px]">
+          Talent Intelligence for the Modern Enterprise
         </h1>
-        <p style={{
-          color: '#4c4451',
-          fontSize: 'clamp(15px, 4vw, 17px)',
-          lineHeight: 1.6,
-          margin: '0 0 48px',
-          maxWidth: 480,
-          marginLeft: 'auto',
-          marginRight: 'auto'
-        }}>
-          The autonomous applicant tracking system that parses talent with AI precision.
+        
+        <p className="text-slate-500 dark:text-slate-400 text-center text-lg max-w-[600px] mb-12">
+          An autonomous applicant tracking system that parses resumes and ranks talent with high-precision AI.
         </p>
 
-        <div style={{
-          display: 'flex',
-          gap: 20,
-          justifyContent: 'center',
-          flexWrap: 'wrap',
-          padding: '0 16px'
-        }}>
-          <Link
-            to="/candidate"
-            style={{
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              padding: '32px 40px',
-              minWidth: 200,
-              gap: 16,
-              textDecoration: 'none',
-              background: '#fff',
-              borderRadius: 20,
-              border: '1px solid #e5e7eb',
-              transition: 'all 0.3s ease',
-              cursor: 'pointer',
-              boxShadow: '0 4px 6px rgba(0,0,0,0.02)'
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.transform = 'translateY(-4px)';
-              e.currentTarget.style.boxShadow = '0 20px 30px rgba(46,0,82,0.1)';
-              e.currentTarget.style.borderColor = '#2e0052';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.transform = 'translateY(0)';
-              e.currentTarget.style.boxShadow = '0 4px 6px rgba(0,0,0,0.02)';
-              e.currentTarget.style.borderColor = '#e5e7eb';
-            }}
+        <div className="flex flex-col md:flex-row gap-6 w-full max-w-[720px] justify-center">
+          
+          <Link 
+            to="/candidate" 
+            className="group flex-1 flex flex-col items-start p-6 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl transition-all duration-200 hover:border-indigo-500 dark:hover:border-indigo-500 hover:shadow-sm"
           >
-            <div style={{
-              width: 56,
-              height: 56,
-              borderRadius: 16,
-              background: 'rgba(46,0,82,0.1)',
-              border: '1px solid rgba(46,0,82,0.2)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center'
-            }}>
-              <svg className="w-7 h-7" fill="none" stroke="#2e0052" viewBox="0 0 24 24" style={{ width: 28, height: 28 }}>
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            <div className="w-12 h-12 mb-4 rounded-lg bg-slate-100 dark:bg-slate-700 flex items-center justify-center group-hover:bg-indigo-50 dark:group-hover:bg-indigo-900/30 transition-colors">
+              <svg className="w-6 h-6 text-indigo-600 dark:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
               </svg>
             </div>
-            <div>
-              <div style={{ fontFamily: 'Manrope, sans-serif', fontWeight: 700, fontSize: 18, marginBottom: 6, color: '#191c1d' }}>Candidate</div>
-              <div style={{ fontSize: 13, color: '#6b7280' }}>Apply & view AI scores</div>
-            </div>
+            <h2 className="text-xl font-bold text-slate-900 dark:text-white font-['Manrope'] mb-1">Candidate Portal</h2>
+            <p className="text-slate-500 dark:text-slate-400 text-sm font-medium">Submit applications and view parsing diagnostics.</p>
           </Link>
 
-          <Link
-            to="/recruiter"
-            style={{
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              padding: '32px 40px',
-              minWidth: 200,
-              gap: 16,
-              textDecoration: 'none',
-              background: 'linear-gradient(135deg, rgba(46,0,82,0.05), rgba(75,0,130,0.08))',
-              borderRadius: 20,
-              border: '2px solid rgba(46,0,82,0.2)',
-              transition: 'all 0.3s ease',
-              cursor: 'pointer',
-              boxShadow: '0 4px 12px rgba(46,0,82,0.08)'
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.transform = 'translateY(-4px)';
-              e.currentTarget.style.boxShadow = '0 20px 30px rgba(46,0,82,0.15)';
-              e.currentTarget.style.borderColor = '#2e0052';
-              e.currentTarget.style.background = 'linear-gradient(135deg, rgba(46,0,82,0.08), rgba(75,0,130,0.12))';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.transform = 'translateY(0)';
-              e.currentTarget.style.boxShadow = '0 4px 12px rgba(46,0,82,0.08)';
-              e.currentTarget.style.borderColor = 'rgba(46,0,82,0.2)';
-              e.currentTarget.style.background = 'linear-gradient(135deg, rgba(46,0,82,0.05), rgba(75,0,130,0.08))';
-            }}
+          <Link 
+            to="/recruiter" 
+            className="group flex-1 flex flex-col items-start p-6 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl transition-all duration-200 hover:border-indigo-500 dark:hover:border-indigo-500 hover:shadow-sm"
           >
-            <div style={{
-              width: 56,
-              height: 56,
-              borderRadius: 16,
-              background: 'linear-gradient(135deg, #2e0052, #4b0082)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              boxShadow: '0 8px 16px rgba(46,0,82,0.2)'
-            }}>
-              <svg className="w-7 h-7" fill="none" stroke="white" viewBox="0 0 24 24" style={{ width: 28, height: 28 }}>
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+            <div className="w-12 h-12 mb-4 rounded-lg bg-indigo-600 flex items-center justify-center">
+              <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
               </svg>
             </div>
-            <div>
-              <div style={{ fontFamily: 'Manrope, sans-serif', fontWeight: 700, fontSize: 18, marginBottom: 6, color: '#191c1d' }}>Recruiter</div>
-              <div style={{ fontSize: 13, color: '#6b7280' }}>Manage jobs & rank talent</div>
-            </div>
+            <h2 className="text-xl font-bold text-slate-900 dark:text-white font-['Manrope'] mb-1">Recruiter Dashboard</h2>
+            <p className="text-slate-500 dark:text-slate-400 text-sm font-medium">Manage job postings and analyze candidate rankings.</p>
           </Link>
-        </div>
 
-        <div style={{
-          marginTop: 64,
-          padding: '20px 24px',
-          fontSize: 12,
-          color: '#6b7280',
-          background: 'rgba(255,255,255,0.5)',
-          borderRadius: 12,
-          backdropFilter: 'blur(10px)',
-          border: '1px solid rgba(0,0,0,0.05)'
-        }}>
-          <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, flexWrap: 'wrap' }}>
-            <span>Powered by BGE-M3</span>
-            <span style={{ width: 4, height: 4, background: '#6b7280', borderRadius: '50%' }}></span>
-            <span>dbmdz BERT</span>
-            <span style={{ width: 4, height: 4, background: '#6b7280', borderRadius: '50%' }}></span>
-            <span>Neo4j Graph</span>
-          </span>
         </div>
       </div>
-
-      {/* Add keyframe animation */}
-      <style jsx>{`
-        @keyframes fadeUp {
-          from {
-            opacity: 0;
-            transform: translateY(20px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-      `}</style>
     </div>
   );
 }

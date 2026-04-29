@@ -11,4 +11,7 @@ joblib
 FlagEmbedding
 torch
 transformers
-psycopg2
+nltk
+psycopg2-binary
+python-multipart
+python-dotenv

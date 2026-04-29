@@ -1,594 +1,417 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-
-function StatPill({ label, value, color }) {
-  return (
-    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2, minWidth: 60 }}>
-      <span style={{ fontFamily: 'Manrope', fontWeight: 700, fontSize: 15, color }}>{value}%</span>
-      <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>{label}</span>
-    </div>
-  );
-}
-
-function RankBadge({ rank }) {
-  const colors = {
-    1: { bg: 'linear-gradient(135deg, #fbbf24, #f59e0b)', text: '#fff' },
-    2: { bg: 'linear-gradient(135deg, #94a3b8, #64748b)', text: '#fff' },
-    3: { bg: 'linear-gradient(135deg, #c2855e, #a16207)', text: '#fff' },
-  };
-  const c = colors[rank] || { bg: '#e1e3e4', text: '#4c4451' };
-  return (
-    <div style={{
-      width: 38,
-      height: 38,
-      borderRadius: '50%',
-      background: c.bg,
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      fontFamily: 'Manrope',
-      fontWeight: 800,
-      fontSize: 14,
-      color: c.text,
-      flexShrink: 0
-    }}>
-      {rank}
-    </div>
-  );
-}
-
-const TIPS = [
-  {
-    title: 'AI Skill Matching',
-    body: 'Our AI cross-references candidate skills against your job description for precise fit scoring.',
-    svg: (
-      <svg fill="none" stroke="url(#g1)" viewBox="0 0 24 24" style={{ width: 36, height: 36 }}>
-        <defs><linearGradient id="g1" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stopColor="#2e0052" /><stop offset="100%" stopColor="#7c3aed" /></linearGradient></defs>
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-      </svg>
-    )
-  },
-  {
-    title: 'Semantic Similarity',
-    body: 'Beyond keywords — we understand context. A "software engineer" and "developer" are treated as equivalent.',
-    svg: (
-      <svg fill="none" stroke="url(#g2)" viewBox="0 0 24 24" style={{ width: 36, height: 36 }}>
-        <defs><linearGradient id="g2" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stopColor="#2e0052" /><stop offset="100%" stopColor="#7c3aed" /></linearGradient></defs>
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-      </svg>
-    )
-  },
-  {
-    title: 'Integrity Score',
-    body: "Detects copy-pasted or AI-generated resumes to ensure you're seeing authentic candidates.",
-    svg: (
-      <svg fill="none" stroke="url(#g3)" viewBox="0 0 24 24" style={{ width: 36, height: 36 }}>
-        <defs><linearGradient id="g3" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stopColor="#2e0052" /><stop offset="100%" stopColor="#7c3aed" /></linearGradient></defs>
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-      </svg>
-    )
-  },
-  {
-    title: 'Real-time Rankings',
-    body: 'Leaderboard updates instantly as new applications arrive — no refresh needed.',
-    svg: (
-      <svg fill="none" stroke="url(#g4)" viewBox="0 0 24 24" style={{ width: 36, height: 36 }}>
-        <defs><linearGradient id="g4" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stopColor="#2e0052" /><stop offset="100%" stopColor="#7c3aed" /></linearGradient></defs>
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M13 10V3L4 14h7v7l9-11h-7z" />
-      </svg>
-    )
-  },
-  {
-    title: 'Final Score Formula',
-    body: 'Final score = weighted blend of Skill Match, Semantic Similarity, and Integrity — tuned for hiring accuracy.',
-    svg: (
-      <svg fill="none" stroke="url(#g5)" viewBox="0 0 24 24" style={{ width: 36, height: 36 }}>
-        <defs><linearGradient id="g5" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stopColor="#2e0052" /><stop offset="100%" stopColor="#7c3aed" /></linearGradient></defs>
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-      </svg>
-    )
-  },
-];
-
-function TipsCarousel() {
-  const [active, setActive] = React.useState(0);
-  React.useEffect(() => {
-    const timer = setInterval(() => setActive(prev => (prev + 1) % TIPS.length), 3500);
-    return () => clearInterval(timer);
-  }, []);
-  const tip = TIPS[active];
-  return (
-    <div style={{
-      background: '#fff', borderRadius: 12, border: '1px solid #e5e7eb',
-      padding: '36px 40px', display: 'flex', flexDirection: 'column',
-      alignItems: 'center', textAlign: 'center', minHeight: 220,
-      justifyContent: 'center', position: 'relative', overflow: 'hidden'
-    }}>
-      <div style={{
-        position: 'absolute', top: 0, left: 0, right: 0, height: 3,
-        background: 'linear-gradient(90deg, #2e0052, #7c3aed)',
-        borderRadius: '12px 12px 0 0'
-      }} />
-      <div style={{
-        width: 64, height: 64, borderRadius: 16, marginBottom: 16,
-        background: 'linear-gradient(135deg, rgba(46,0,82,.08), rgba(124,58,237,.08))',
-        border: '1px solid rgba(124,58,237,.15)',
-        display: 'flex', alignItems: 'center', justifyContent: 'center'
-      }}>
-        {tip.svg}
-      </div>
-      <div style={{ fontFamily: 'Manrope', fontWeight: 800, fontSize: 18, color: '#111827', marginBottom: 8 }}>
-        {tip.title}
-      </div>
-      <div style={{ fontSize: 14, color: '#4c4451', maxWidth: 480, lineHeight: 1.6 }}>
-        {tip.body}
-      </div>
-      <div style={{ display: 'flex', gap: 6, marginTop: 24 }}>
-        {TIPS.map((_, i) => (
-          <div key={i} onClick={() => setActive(i)} style={{
-            width: i === active ? 20 : 6, height: 6, borderRadius: 3,
-            background: i === active ? '#2e0052' : '#e1e3e4',
-            cursor: 'pointer', transition: 'all 0.3s ease'
-          }} />
-        ))}
-      </div>
-      <div style={{ marginTop: 20, fontSize: 12, color: '#4c4451', display: 'flex', alignItems: 'center', gap: 6 }}>
-        <svg fill="none" stroke="#4c4451" viewBox="0 0 24 24" style={{ width: 13, height: 13 }}>
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5" />
-        </svg>
-        Select a job listing from the sidebar to view the AI-ranked leaderboard
-      </div>
-    </div>
-  );
-}
+import RadarChart from '../components/RadarChart';
+import PDFViewer from '../components/PDFViewer';
+import ThemeToggle from '../components/ThemeToggle';
 
 export default function RecruiterPage() {
   const [jobs, setJobs] = useState([]);
   const [selectedJob, setSelectedJob] = useState(null);
   const [applications, setApplications] = useState([]);
-  const [newTitle, setNewTitle] = useState('');
-  const [newDesc, setNewDesc] = useState('');
-  const [isPosting, setIsPosting] = useState(false);
-  const [postError, setPostError] = useState('');
+  
+  // Job Form State
+  const [isEditing, setIsEditing] = useState(false);
+  const [editJobId, setEditJobId] = useState(null);
+  const [jobTitle, setJobTitle] = useState('');
+  const [jobDesc, setJobDesc] = useState('');
+  const [isSaving, setIsSaving] = useState(false);
+  const [formError, setFormError] = useState('');
   const [showForm, setShowForm] = useState(false);
-  const [totalApplicants, setTotalApplicants] = useState(0);
-  const [availablejobs, setAvailableJobs] = useState([]);
+  
+  const [selectedCandidate, setSelectedCandidate] = useState(null);
+  const [isDeletingApp, setIsDeletingApp] = useState(null);
 
   useEffect(() => { fetchJobs(); }, []);
-
-  const availableJobs = async () => {
-    try {
-      const r = await fetch('http://localhost:8000/jobs');
-      setAvailableJobs(await r.json());
-    } catch (e) { console.error(e); }
-  }
 
   const fetchJobs = async () => {
     try {
       const r = await fetch('http://localhost:8000/api/jobs');
-      const jobsData = await r.json();
-      setJobs(jobsData);
-
-      // Fetch applications count for all jobs
-      let total = 0;
-      for (let job of jobsData) {
-        const res = await fetch(`http://localhost:8000/api/jobs/${job.id}/applications`);
-        const apps = await res.json();
-        total += apps.length;
-      }
-      setTotalApplicants(total);
-
-    } catch (e) {
-      console.error(e);
-    }
+      const data = await r.json();
+      setJobs(data);
+    } catch (e) { console.error(e); }
   };
 
-  const handleCreate = async () => {
-    if (!newTitle.trim() || !newDesc.trim()) { setPostError('Both fields are required.'); return; }
-    setIsPosting(true); setPostError('');
+  const handleSaveJob = async () => {
+    if (!jobTitle.trim() || !jobDesc.trim()) { setFormError('Both fields are required.'); return; }
+    setIsSaving(true); setFormError('');
     try {
-      await fetch('http://localhost:8000/api/jobs', {
-        method: 'POST',
+      const url = isEditing ? `http://localhost:8000/api/jobs/${editJobId}` : 'http://localhost:8000/api/jobs';
+      const method = isEditing ? 'PUT' : 'POST';
+      
+      const r = await fetch(url, {
+        method: method,
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ title: newTitle.trim(), description: newDesc.trim() }),
+        body: JSON.stringify({ title: jobTitle.trim(), description: jobDesc.trim() }),
       });
-      setNewTitle(''); setNewDesc(''); setShowForm(false);
+      
+      if (!r.ok) throw new Error('Failed to save job');
+      
+      const savedJob = await r.json();
+      
+      setJobTitle(''); setJobDesc(''); setShowForm(false); setIsEditing(false); setEditJobId(null);
       await fetchJobs();
-    } catch (e) { setPostError('Failed to create job.'); }
-    finally { setIsPosting(false); }
+      
+      if (selectedJob?.id === editJobId) {
+        setSelectedJob(savedJob);
+      }
+    } catch (e) { setFormError('Failed to save job.'); }
+    finally { setIsSaving(false); }
+  };
+
+  const handleDeleteJob = async (e, jobId) => {
+    e.stopPropagation();
+    if (!window.confirm("Are you sure? This will delete the job and all its applications.")) return;
+    
+    try {
+      await fetch(`http://localhost:8000/api/jobs/${jobId}`, { method: 'DELETE' });
+      if (selectedJob?.id === jobId) setSelectedJob(null);
+      await fetchJobs();
+    } catch (e) { console.error(e); }
+  };
+
+  const openEditForm = (e, job) => {
+    e.stopPropagation();
+    setIsEditing(true);
+    setEditJobId(job.id);
+    setJobTitle(job.title);
+    setJobDesc(job.description);
+    setShowForm(true);
   };
 
   const selectJob = async (job) => {
     setSelectedJob(job);
+    setSelectedCandidate(null);
+    fetchApplications(job.id);
+  };
+
+  const fetchApplications = async (jobId) => {
     try {
-      const r = await fetch(`http://localhost:8000/api/jobs/${job.id}/applications`);
+      const r = await fetch(`http://localhost:8000/api/jobs/${jobId}/applications`);
       setApplications(await r.json());
     } catch (e) { console.error(e); }
   };
 
-  useEffect(() => {
-    if (showForm) {
-      availableJobs();
-    }
-  }, [showForm]);
+  const handleDeleteApplication = async (e, appId) => {
+    e.stopPropagation();
+    if (!window.confirm("Delete this candidate application?")) return;
+    
+    setIsDeletingApp(appId);
+    try {
+      await fetch(`http://localhost:8000/api/applications/${appId}`, { method: 'DELETE' });
+      setApplications(prev => prev.filter(app => app.id !== appId));
+      if (selectedCandidate?.id === appId) setSelectedCandidate(null);
+    } catch (e) { console.error(e); }
+    finally { setIsDeletingApp(null); }
+  };
+
+  const getScoreColor = (score) => {
+    if (score >= 80) return "#10B981";
+    if (score >= 60) return "#F59E0B";
+    return "#F43F5E";
+  };
 
   return (
-    <div className="bg-background text-on-surface font-body min-h-screen flex antialiased bg-[#f8f9fa]">
+    <div className="flex min-h-screen bg-[var(--bg-app)] font-['Inter'] text-slate-900 dark:text-white transition-colors duration-200 overflow-hidden">
 
-      {/* ── Sidebar ── */}
-      <aside className="sidebar" style={{
-        width: 280,
-        background: '#fff',
-        borderRight: '1px solid #e5e7eb',
-        padding: '24px 20px',
-        display: 'flex',
-        flexDirection: 'column',
-        position: 'sticky',
-        top: 0,
-        height: '100vh',
-        overflowY: 'auto'
-      }}>
-        <div className="sidebar-logo" style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 32 }}>
-          <div className="sidebar-logo-icon" style={{
-            width: 32,
-            height: 32,
-            background: 'linear-gradient(135deg, #2e0052, #4b0082)',
-            borderRadius: 8,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center'
-          }}>
-            <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ width: 18, height: 18, color: '#fff' }}>
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+      {/* Sidebar */}
+      <aside className="w-[280px] fixed top-0 left-0 h-screen bg-[var(--bg-card)] border-r border-slate-200 dark:border-slate-800 flex flex-col p-6 z-20">
+        <div className="flex items-center gap-3 mb-8">
+          <div className="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center text-white">
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
             </svg>
           </div>
-          <div className="sidebar-logo-text">
-            <div className="name" style={{ fontFamily: 'Manrope', fontWeight: 800, fontSize: 18, color: '#111827' }}>Aira</div>
-            <div className="sub" style={{ fontSize: 11, color: '#6b7280' }}>Recruiter Portal</div>
+          <div>
+            <div className="font-['Manrope'] font-bold text-base tracking-tight text-slate-900 dark:text-white">Aira Professional</div>
+            <div className="text-[10px] uppercase tracking-wider text-slate-500 font-semibold">Recruiter Suite</div>
           </div>
         </div>
 
-        <nav style={{ display: 'flex', flexDirection: 'column', gap: 4, marginBottom: 24 }}>
-          <Link to="/" className="nav-link" style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: 12,
-            padding: '10px 12px',
-            borderRadius: 8,
-            color: '#374151',
-            textDecoration: 'none',
-            fontSize: 14,
-            transition: 'all 0.2s'
-          }}>
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ width: 20, height: 20 }}>
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-            </svg>
+        <nav className="flex flex-col gap-1.5 mb-6">
+          <Link to="/" className="flex items-center gap-3 px-3 py-2 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-md font-medium text-sm transition-colors border border-transparent">
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" /></svg>
             Home
           </Link>
-          <a className="nav-link active" style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: 12,
-            padding: '10px 12px',
-            borderRadius: 8,
-            background: '#f3f4f6',
-            color: '#2e0052',
-            textDecoration: 'none',
-            fontSize: 14,
-            fontWeight: 600
-          }}>
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ width: 20, height: 20 }}>
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-            </svg>
-            Job Postings
-          </a>
+          <div className="flex items-center gap-3 px-3 py-2 bg-indigo-50 dark:bg-indigo-900/20 text-indigo-700 dark:text-indigo-400 rounded-md font-semibold text-sm cursor-pointer border border-indigo-100 dark:border-indigo-800/30">
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
+            Manage Jobs
+          </div>
         </nav>
 
-        {/* Post New Job button */}
-        <button className="btn btn-primary" style={{
-          width: '100%',
-          marginBottom: 20,
-          padding: '10px 16px',
-          background: '#2e0052',
-          color: '#fff',
-          border: 'none',
-          borderRadius: 8,
-          fontSize: 14,
-          fontWeight: 600,
-          cursor: 'pointer',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          gap: 8
-        }} onClick={() => setShowForm(!showForm)}>
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ width: 18, height: 18 }}>
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-          </svg>
-          New Job Posting
+        <button 
+          onClick={() => { setShowForm(!showForm); setIsEditing(false); setJobTitle(''); setJobDesc(''); }}
+          className="w-full py-2 bg-indigo-600 text-white rounded-md font-semibold text-xs hover:bg-indigo-700 transition-colors flex items-center justify-center gap-2 mb-6"
+        >
+          <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" /></svg>
+          {showForm && !isEditing ? 'Cancel New Job' : 'Add New Opening'}
         </button>
 
-        {/* Inline create form */}
         {showForm && (
-          <div style={{ marginBottom: 20, display: 'flex', flexDirection: 'column', gap: 10 }}>
+          <div className="flex flex-col gap-2 mb-6 bg-slate-50 dark:bg-slate-800/50 p-3 rounded-lg border border-slate-200 dark:border-slate-700 shadow-sm fade-up">
             <input
-              className="input-field"
-              placeholder="Job Title..."
-              value={newTitle}
-              onChange={e => setNewTitle(e.target.value)}
-              style={{
-                fontSize: 13,
-                color: '#191c1d',
-                padding: '10px 12px',
-                border: '1px solid #e1e3e4',
-                background: '#f8f9fa',
-                borderRadius: 6,
-                outline: 'none'
-              }}
+              type="text"
+              placeholder="e.g. Senior Software Engineer"
+              className="w-full text-xs p-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded outline-none focus:border-indigo-500 text-slate-900 dark:text-slate-100"
+              value={jobTitle}
+              onChange={e => setJobTitle(e.target.value)}
             />
             <textarea
-              className="input-field"
-              placeholder="Job description…"
-              value={newDesc}
-              onChange={e => setNewDesc(e.target.value)}
+              className="w-full text-xs p-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded outline-none focus:border-indigo-500 resize-none text-slate-900 dark:text-slate-100"
+              placeholder="Job description..."
               rows={4}
-              style={{
-                resize: 'vertical',
-                fontSize: 13,
-                color: '#191c1d',
-                lineHeight: 1.5,
-                padding: '10px 12px',
-                border: '1px solid #e1e3e4',
-                background: '#f8f9fa',
-                borderRadius: 6,
-                outline: 'none',
-                fontFamily: 'inherit'
-              }}
+              value={jobDesc}
+              onChange={e => setJobDesc(e.target.value)}
             />
-            {postError && <p style={{ fontSize: 12, color: '#f87171', margin: 0 }}>{postError}</p>}
-            <div style={{ display: 'flex', gap: 8 }}>
-              <button className="btn btn-primary" style={{
-                flex: 1,
-                fontSize: 13,
-                padding: '10px',
-                background: '#2e0052',
-                color: '#fff',
-                border: 'none',
-                borderRadius: 6,
-                cursor: 'pointer'
-              }} onClick={handleCreate} disabled={isPosting}>
-                {isPosting ? 'Posting…' : 'Create'}
+            {formError && <p className="text-[10px] text-rose-500">{formError}</p>}
+            <div className="flex gap-2 mt-1">
+              <button onClick={handleSaveJob} disabled={isSaving} className="flex-1 bg-indigo-600 text-white text-xs font-semibold py-1.5 rounded hover:bg-indigo-700">
+                {isSaving ? 'Saving...' : isEditing ? 'Update' : 'Save'}
               </button>
-              <button className="btn btn-ghost" style={{
-                fontSize: 13,
-                padding: '10px 12px',
-                background: '#f3f4f6',
-                border: '1px solid #e5e7eb',
-                borderRadius: 6,
-                cursor: 'pointer'
-              }} onClick={() => { setShowForm(false); setPostError(''); }}>Cancel</button>
+              <button onClick={() => { setShowForm(false); setIsEditing(false); setFormError(''); }} className="flex-1 bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 text-slate-700 dark:text-slate-300 text-xs font-medium py-1.5 rounded">
+                Cancel
+              </button>
             </div>
           </div>
         )}
 
-        {/* Job list */}
-        <div style={{ fontSize: 11, fontWeight: 700, color: '#4c4451', textTransform: 'uppercase', letterSpacing: '.08em', marginBottom: 10 }}>
-          Active Listings ({jobs.length})
-        </div>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 8, overflowY: 'auto', flex: 1 }}>
-          {jobs.length === 0 ? (
-            <p style={{ fontSize: 13, color: '#4c4451', padding: '12px 0' }}>No jobs yet.</p>
-          ) : jobs.map(job => (
-            <div key={job.id} className={`job-card ${selectedJob?.id === job.id ? 'active' : ''}`} onClick={() => selectJob(job)} style={{
-              padding: '12px',
-              borderRadius: 8,
-              cursor: 'pointer',
-              transition: 'all 0.2s',
-              background: selectedJob?.id === job.id ? '#f3f4f5' : 'transparent',
-              border: selectedJob?.id === job.id ? '1px solid #e1e3e4' : '1px solid transparent'
-            }}>
-              <div className="title" style={{ fontWeight: 600, fontSize: 14, marginBottom: 4, wordBreak: 'break-word', color: '#111827' }}>{job.title}</div>
-              <div className="desc" style={{ fontSize: 12, color: '#4c4451', overflow: 'hidden', textOverflow: 'ellipsis', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', wordBreak: 'break-word' }}>{job.description}</div>
-            </div>
-          ))}
+        <div className="flex-1 overflow-y-auto hide-scrollbar">
+          <div className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2 px-1">Active Listings ({jobs.length})</div>
+          <div className="flex flex-col gap-1.5">
+            {jobs.map(job => (
+              <div 
+                key={job.id} 
+                onClick={() => selectJob(job)}
+                className={`group p-2.5 rounded-md cursor-pointer border transition-all ${selectedJob?.id === job.id ? 'bg-indigo-50 dark:bg-indigo-900/20 border-indigo-100 dark:border-indigo-800/30' : 'bg-white dark:bg-slate-800 border-transparent hover:border-slate-200 dark:hover:border-slate-700'}`}
+              >
+                <div className="flex justify-between items-start mb-0.5">
+                  <div className="font-semibold text-xs truncate text-slate-900 dark:text-slate-200 pr-2">{job.title}</div>
+                  <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <button onClick={(e) => openEditForm(e, job)} className="p-1 hover:text-indigo-600 text-slate-400">
+                      <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
+                    </button>
+                    <button onClick={(e) => handleDeleteJob(e, job.id)} className="p-1 hover:text-rose-600 text-slate-400">
+                      <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                    </button>
+                  </div>
+                </div>
+                <div className="text-[10px] text-slate-500 line-clamp-2">{job.description}</div>
+              </div>
+            ))}
+          </div>
         </div>
 
-        <div style={{ marginTop: 'auto', paddingTop: 20, borderTop: '1px solid #e5e7eb' }}>
-          <Link to="/candidate" className="nav-link" style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: 8,
-            padding: '10px 12px',
-            borderRadius: 8,
-            background: 'rgba(46,0,82,.08)',
-            border: '1px solid rgba(46,0,82,.2)',
-            color: '#2e0052',
-            textDecoration: 'none',
-            fontSize: 14
-          }}>
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ width: 16, height: 16 }}>
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-            </svg>
+        <div className="mt-4 pt-4 border-t border-slate-200 dark:border-slate-800">
+          <Link to="/candidate" className="flex items-center justify-center gap-2 w-full py-2 px-4 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-700 dark:text-slate-300 font-semibold text-xs hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors">
+            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
             Candidate Portal
           </Link>
         </div>
       </aside>
 
-      {/* ── Main Content ── */}
-      <main className="main-content" style={{ flex: 1, padding: '32px 40px', overflowX: 'auto', background: '#f8f9fa' }}>
-        {!selectedJob ? (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 32, maxWidth: 1200 }}>
-            <div className="fade-up">
-              <h1 style={{ fontFamily: 'Manrope', fontWeight: 900, fontSize: 'clamp(24px, 5vw, 34px)', margin: '0 0 8px', letterSpacing: '-1px', wordBreak: 'break-word', color: '#191c1d' }}>Recruiter Dashboard</h1>
-              <p style={{ color: '#4c4451', fontSize: 15, margin: 0 }}>Create job postings and review AI-graded applicants ranked by overall fit.</p>
+      {/* Main Content Area */}
+      <main className="ml-[280px] flex-1 flex flex-col h-screen min-h-0 p-8 max-w-[1400px]">
+        <div className="flex justify-end mb-4">
+          <ThemeToggle />
+        </div>
+
+        {selectedCandidate ? (
+          /* SPLIT PANEL VIEW */
+          <div className="fade-up flex flex-col h-[calc(100vh-6rem)] min-h-0 gap-4">
+            <div className="flex items-center justify-between">
+              <button 
+                onClick={() => setSelectedCandidate(null)}
+                className="text-indigo-600 dark:text-indigo-400 font-medium text-xs flex items-center gap-1 hover:underline"
+              >
+                &larr; Back to Leaderboard
+              </button>
+              <button 
+                onClick={(e) => handleDeleteApplication(e, selectedCandidate.id)}
+                className="px-3 py-1 bg-rose-50 dark:bg-rose-900/20 text-rose-600 dark:text-rose-400 rounded-md text-xs font-bold border border-rose-100 dark:border-rose-800/30 hover:bg-rose-100 dark:hover:bg-rose-900/40 transition-colors flex items-center gap-1.5"
+              >
+                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                Delete Application
+              </button>
             </div>
 
-            {/* Stats Row */}
-            <div className="fade-up-d1" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 16 }}>
-              {[
-                { icon: 'work', label: 'Active Postings', value: jobs.length, color: '46,0,82' },
-                { icon: 'group', label: 'Total Applicants', value: totalApplicants, color: '124,58,237' },
-                { icon: 'speed', label: 'Avg Turnaround', value: '< 30s', color: '16,185,129' },
-              ].map(({ icon, label, value, color }, i) => (
-                <div key={i} className="card fade-up" style={{ padding: '24px', display: 'flex', alignItems: 'center', gap: 16, background: '#fff', borderRadius: 12, border: '1px solid #e1e3e4', boxShadow: '0 4px 20px rgba(46,0,82,0.02)' }}>
-                  <div style={{ width: 48, height: 48, borderRadius: 14, flexShrink: 0, background: `rgba(${color},.12)`, border: `1px solid rgba(${color},.2)`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    <svg className="w-6 h-6" fill="none" stroke={`rgb(${color})`} viewBox="0 0 24 24" style={{ width: 22, height: 22 }}>
-                      {icon === 'work' && <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />}
-                      {icon === 'group' && <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />}
-                      {icon === 'speed' && <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />}
-                    </svg>
+            <div className="flex-1 flex flex-col lg:flex-row gap-4 min-h-0">
+              <div className="lg:w-[60%] min-h-0 bg-[#1E1E2E] rounded-lg shadow-sm border border-slate-800 flex flex-col overflow-hidden relative">
+                <PDFViewer fileUrl={selectedCandidate.resume_path ? `http://localhost:8000${selectedCandidate.resume_path}` : null} />
+              </div>
+
+              <div className="lg:w-[40%] min-h-0 flex flex-col gap-4 overflow-y-auto hide-scrollbar pr-1 pb-4">
+                <div className="bg-white dark:bg-slate-800 rounded-lg p-6 shadow-sm border border-slate-200 dark:border-slate-700 flex flex-col items-center">
+                  <img
+                    alt={selectedCandidate.candidate_name}
+                    src={`https://ui-avatars.com/api/?name=${encodeURIComponent(selectedCandidate.candidate_name)}&background=EEF2FF&color=4F46E5&size=128`}
+                    className="w-16 h-16 rounded-full shadow-sm mb-3 border border-slate-100 dark:border-slate-700"
+                  />
+                  <h2 className="text-xl font-bold font-['Manrope'] mb-1 text-slate-900 dark:text-white text-center">{selectedCandidate.candidate_name}</h2>
+                  <p className="text-slate-500 dark:text-slate-400 text-xs mb-5 text-center">Applied for: {selectedJob.title}</p>
+                  
+                  <div className="text-center mb-6">
+                    <div className="text-[10px] font-bold text-slate-500 uppercase mb-1">AI Match Score</div>
+                    <div className="text-3xl font-extrabold" style={{ color: getScoreColor(selectedCandidate.final_score) }}>{selectedCandidate.final_score}%</div>
                   </div>
-                  <div>
-                    <div style={{ fontFamily: 'Manrope', fontWeight: 800, fontSize: 28, color: `rgb(${color})` }}>{value}</div>
-                    <div style={{ fontSize: 13, color: '#4c4451', marginTop: 2 }}>{label}</div>
+
+                  <div className="grid grid-cols-3 gap-3 w-full">
+                    <div className="flex flex-col items-center p-2 bg-slate-50 dark:bg-slate-900/50 rounded border border-slate-200 dark:border-slate-700">
+                      <span className="text-slate-500 dark:text-slate-400 text-[9px] font-bold uppercase">Skill</span>
+                      <span className="font-bold text-sm text-slate-900 dark:text-white">{selectedCandidate.skill_match || 0}%</span>
+                    </div>
+                    <div className="flex flex-col items-center p-2 bg-slate-50 dark:bg-slate-900/50 rounded border border-slate-200 dark:border-slate-700">
+                      <span className="text-slate-500 dark:text-slate-400 text-[9px] font-bold uppercase">Semantic</span>
+                      <span className="font-bold text-sm text-slate-900 dark:text-white">{selectedCandidate.semantic_similarity || 0}%</span>
+                    </div>
+                    <div className="flex flex-col items-center p-2 bg-slate-50 dark:bg-slate-900/50 rounded border border-slate-200 dark:border-slate-700">
+                      <span className="text-slate-500 dark:text-slate-400 text-[9px] font-bold uppercase">Integrity</span>
+                      <span className="font-bold text-sm text-slate-900 dark:text-white">{selectedCandidate.fraud_integrity || 0}%</span>
+                    </div>
                   </div>
                 </div>
-              ))}
+
+                <div className="bg-white dark:bg-slate-800 rounded-lg p-5 shadow-sm border border-slate-200 dark:border-slate-700">
+                  <h3 className="font-bold text-sm mb-4 font-['Manrope'] text-slate-900 dark:text-white">JD Match Analysis</h3>
+                  <RadarChart 
+                    breakdown={selectedCandidate.breakdown || {
+                      semantic_similarity: selectedCandidate.semantic_similarity,
+                      skill_match: selectedCandidate.skill_match,
+                      experience_match: selectedCandidate.skill_match - 10 > 0 ? selectedCandidate.skill_match - 10 : 0,
+                      education_match: 100,
+                      projects_match: 100
+                    }} 
+                    finalScore={selectedCandidate.final_score} 
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+        ) : !selectedJob ? (
+          /* Empty State */
+          <div className="flex flex-col gap-8">
+            <div className="fade-up">
+              <h1 className="font-['Manrope'] font-bold text-3xl mb-1 text-slate-900 dark:text-white tracking-tight">Recruiter Suite</h1>
+              <p className="text-slate-500 dark:text-slate-400 text-lg">Manage your talent pipeline and analyze AI-ranked candidates.</p>
             </div>
 
-            <div className="fade-up-d2" style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-              {/* Tips Carousel */}
-              <TipsCarousel />
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 fade-up">
+              <div className="bg-white dark:bg-slate-800 p-6 rounded-lg border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-between h-[160px]">
+                <div className="w-12 h-12 rounded-lg bg-indigo-50 dark:bg-indigo-900/30 flex items-center justify-center">
+                  <svg className="w-6 h-6 text-indigo-600 dark:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
+                </div>
+                <div>
+                  <div className="text-2xl font-bold text-slate-900 dark:text-white font-['Manrope']">{jobs.length}</div>
+                  <div className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Active Job Listings</div>
+                </div>
+              </div>
+              <div className="bg-white dark:bg-slate-800 p-6 rounded-lg border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-between h-[160px]">
+                <div className="w-12 h-12 rounded-lg bg-cyan-50 dark:bg-cyan-900/30 flex items-center justify-center">
+                  <svg className="w-6 h-6 text-cyan-600 dark:text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
+                </div>
+                <div>
+                  <div className="text-2xl font-bold text-slate-900 dark:text-white font-['Manrope']">Pro</div>
+                  <div className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Suite Status</div>
+                </div>
+              </div>
+              <div className="bg-white dark:bg-slate-800 p-6 rounded-lg border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-between h-[160px]">
+                <div className="w-12 h-12 rounded-lg bg-emerald-50 dark:bg-emerald-900/30 flex items-center justify-center">
+                  <svg className="w-6 h-6 text-emerald-600 dark:text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+                </div>
+                <div>
+                  <div className="text-2xl font-bold text-emerald-600 dark:text-emerald-500 font-['Manrope']">&lt; 30s</div>
+                  <div className="text-xs font-semibold text-slate-500 uppercase tracking-wider">AI Processing Latency</div>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex-1 flex flex-col items-center justify-center p-12 border border-dashed border-slate-300 dark:border-slate-700 rounded-lg bg-slate-50/50 dark:bg-slate-800/30 fade-up">
+              <div className="w-16 h-16 rounded-full bg-slate-200 dark:bg-slate-800 flex items-center justify-center text-slate-400 mb-4">
+                <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" /></svg>
+              </div>
+              <p className="font-semibold text-slate-600 dark:text-slate-400">Select a job from the sidebar to view ranked applicants.</p>
             </div>
           </div>
         ) : (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 28, maxWidth: '100%', overflowX: 'auto' }}>
-
-            {/* Job Header */}
-            <div className="fade-up" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 12 }}>
+          /* LEADERBOARD VIEW */
+          <div className="flex flex-col h-full fade-up">
+            <div className="flex items-center justify-between mb-6">
               <div>
-                <button onClick={() => setSelectedJob(null)} className="btn btn-ghost" style={{
-                  fontSize: 12,
-                  padding: '6px 12px',
-                  marginBottom: 14,
-                  background: '#f3f4f6',
-                  border: '1px solid #e5e7eb',
-                  borderRadius: 6,
-                  cursor: 'pointer',
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: 6
-                }}>
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ width: 15, height: 15 }}>
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-                  </svg>
-                  All Jobs
-                </button>
-                <h1 style={{ fontFamily: 'Manrope', fontWeight: 900, fontSize: 'clamp(24px, 5vw, 30px)', margin: '0 0 6px', letterSpacing: '-1px', wordBreak: 'break-word', color: '#191c1d' }}>{selectedJob.title}</h1>
-                <p style={{ fontSize: 13, color: '#4c4451', margin: 0 }}>
-                  {applications.length} applicant{applications.length !== 1 ? 's' : ''} · ranked by AI score
-                </p>
+                <h1 className="font-['Manrope'] font-bold text-2xl mb-1 text-slate-900 dark:text-white">{selectedJob.title}</h1>
+                <p className="text-slate-500 dark:text-slate-400 text-sm">Sorted by AI Match Confidence • {applications.length} Candidates</p>
               </div>
-              <div style={{ background: 'rgba(46,0,82,.08)', border: '1px solid rgba(46,0,82,.2)', borderRadius: 12, padding: '12px 18px', fontSize: 13 }}>
-                <svg className="w-4 h-4" fill="none" stroke="#2e0052" viewBox="0 0 24 24" style={{ width: 15, height: 15, display: 'inline', verticalAlign: 'middle', marginRight: 6 }}>
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                <span style={{ color: '#2e0052', fontWeight: 600 }}>Scores auto-update as new applications arrive</span>
+              <div className="flex gap-2">
+                <button onClick={(e) => openEditForm(e, selectedJob)} className="px-3 py-1.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded text-xs font-bold text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors">
+                  Edit Job Details
+                </button>
               </div>
             </div>
 
-            {/* Leaderboard */}
-            {applications.length === 0 ? (
-              <div className="empty-state fade-up-d1" style={{
-                textAlign: 'center',
-                padding: '60px 20px',
-                background: '#fff',
-                borderRadius: 12,
-                border: '1px solid #e1e3e4',
-                boxShadow: '0 4px 20px rgba(46,0,82,0.02)'
-              }}>
-                <svg className="w-12 h-12 mx-auto mb-4" fill="none" stroke="#4c4451" viewBox="0 0 24 24" style={{ width: 48, height: 48, margin: '0 auto 16px', color: '#9ca3af' }}>
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
-                </svg>
-                <p style={{ fontFamily: 'Manrope', fontWeight: 700, fontSize: 16, margin: '0 0 4px', color: '#191c1d' }}>No applications yet</p>
-                <p style={{ fontSize: 13, color: '#4c4451', margin: '0 0 12px' }}>Share the Candidate Portal link to start receiving applications.</p>
-                <Link to="/candidate" className="btn btn-ghost" style={{
-                  fontSize: 13,
-                  padding: '8px 16px',
-                  background: '#f3f4f6',
-                  border: '1px solid #e5e7eb',
-                  borderRadius: 6,
-                  textDecoration: 'none',
-                  color: '#374151',
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: 6
-                }}>
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ width: 15, height: 15 }}>
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                  </svg>
-                  Open Candidate Portal
-                </Link>
-              </div>
-            ) : (
-              <div className="fade-up-d1" style={{ display: 'flex', flexDirection: 'column', gap: 10, overflowX: 'auto' }}>
-                {/* Column headers */}
-                <div style={{
-                  display: 'grid',
-                  gridTemplateColumns: '38px 1fr auto 100px',
-                  alignItems: 'center',
-                  gap: 16,
-                  padding: '0 20px 12px 20px',
-                  fontSize: 11,
-                  fontWeight: 700,
-                  color: '#4c4451',
-                  textTransform: 'uppercase',
-                  letterSpacing: '.07em',
-                  borderBottom: '1px solid #e1e3e4',
-                  minWidth: 800
-                }}>
-                  <span>#</span>
-                  <span>Candidate</span>
-                  <div style={{ display: 'flex', gap: 32, justifySelf: 'end' }}>
-                    <span style={{ minWidth: 60, textAlign: 'center' }}>Skill</span>
-                    <span style={{ minWidth: 60, textAlign: 'center' }}>Semantic</span>
-                    <span style={{ minWidth: 60, textAlign: 'center' }}>Integrity</span>
-                  </div>
-                  <span style={{ textAlign: 'center' }}>Final Score</span>
+            <div className="flex-1 overflow-auto bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-800 shadow-sm">
+              {applications.length === 0 ? (
+                <div className="flex flex-col items-center justify-center h-full p-12 text-center text-slate-500">
+                  <p className="font-medium text-sm mb-2">No applications yet</p>
+                  <p className="text-xs">Once candidates apply through the portal, they will appear here ranked by fit.</p>
                 </div>
-
-                {applications.map((app, i) => (
-                  <div key={app.id} className={`rank-row fade-up`} style={{
-                    display: 'grid',
-                    gridTemplateColumns: '38px 1fr auto 100px',
-                    alignItems: 'center',
-                    gap: 16,
-                    padding: '16px 20px',
-                    background: '#fff',
-                    borderRadius: 12,
-                    border: '1px solid #e5e7eb',
-                    transition: 'all 0.2s',
-                    minWidth: 800
-                  }}>
-                    <RankBadge rank={i + 1} />
-
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 14, minWidth: 0 }}>
-                      <img
-                        alt={app.candidate_name}
-                        src={`https://ui-avatars.com/api/?name=${encodeURIComponent(app.candidate_name)}&background=e7e8e9&color=2e0052&size=80`}
-                        style={{ width: 40, height: 40, borderRadius: '50%', flexShrink: 0, border: '1px solid #e1e3e4' }}
-                      />
-                      <div style={{ overflow: 'hidden' }}>
-                        <div style={{ fontWeight: 700, fontSize: 15, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', color: '#191c1d' }}>{app.candidate_name}</div>
-                        <div style={{ fontSize: 12, color: '#4c4451', marginTop: 2 }}>Applied via Aira Portal</div>
-                      </div>
-                    </div>
-
-                    <div style={{ display: 'flex', gap: 32, alignItems: 'center', justifySelf: 'end' }}>
-                      <StatPill label="Skill" value={app.skill_match} color="#7c3aed" />
-                      <StatPill label="Semantic" value={app.semantic_similarity} color="#a855f7" />
-                      <StatPill label="Integrity" value={app.fraud_integrity} color="#10b981" />
-                    </div>
-
-                    <div style={{ textAlign: 'center', flexShrink: 0 }}>
-                      <div style={{ fontFamily: 'Manrope', fontWeight: 900, fontSize: 28, background: 'linear-gradient(135deg, #2e0052, #7c3aed)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', letterSpacing: '-1px' }}>
-                        {app.final_score}%
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
+              ) : (
+                <table className="w-full text-left border-collapse">
+                  <thead className="bg-slate-50 dark:bg-slate-900/50 sticky top-0 z-10">
+                    <tr className="text-[10px] font-bold text-slate-500 uppercase tracking-wider border-b border-slate-200 dark:border-slate-800">
+                      <th className="px-6 py-4 w-16 text-center">Rank</th>
+                      <th className="px-6 py-4">Candidate</th>
+                      <th className="px-6 py-4 text-center">Skill</th>
+                      <th className="px-6 py-4 text-center">Semantic</th>
+                      <th className="px-6 py-4 text-center">Integrity</th>
+                      <th className="px-6 py-4 text-center">Score</th>
+                      <th className="px-6 py-4 w-20"></th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
+                    {applications.map((app, i) => (
+                      <tr 
+                        key={app.id} 
+                        onClick={() => setSelectedCandidate(app)}
+                        className="group hover:bg-slate-50 dark:hover:bg-slate-900/30 cursor-pointer transition-colors"
+                      >
+                        <td className="px-6 py-4 text-center">
+                          <span className={`text-xs font-bold ${i < 3 ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-400'}`}>#{i + 1}</span>
+                        </td>
+                        <td className="px-6 py-4">
+                          <div className="flex items-center gap-3">
+                            <img
+                              alt={app.candidate_name}
+                              src={`https://ui-avatars.com/api/?name=${encodeURIComponent(app.candidate_name)}&background=F3F4F8&color=111827&size=64`}
+                              className="w-8 h-8 rounded-full border border-slate-200 dark:border-slate-700"
+                            />
+                            <div className="font-semibold text-slate-900 dark:text-slate-200 text-sm">{app.candidate_name}</div>
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 text-center">
+                          <span className="text-xs font-medium text-slate-600 dark:text-slate-400">{app.skill_match}%</span>
+                        </td>
+                        <td className="px-6 py-4 text-center">
+                          <span className="text-xs font-medium text-slate-600 dark:text-slate-400">{app.semantic_similarity}%</span>
+                        </td>
+                        <td className="px-6 py-4 text-center">
+                          <span className="text-xs font-medium text-slate-600 dark:text-slate-400">{app.fraud_integrity}%</span>
+                        </td>
+                        <td className="px-6 py-4 text-center">
+                          <span className="font-bold text-sm" style={{ color: getScoreColor(app.final_score) }}>
+                            {app.final_score}%
+                          </span>
+                        </td>
+                        <td className="px-6 py-4 text-right">
+                          <button 
+                            onClick={(e) => handleDeleteApplication(e, app.id)}
+                            className="p-1.5 text-slate-400 hover:text-rose-600 opacity-0 group-hover:opacity-100 transition-opacity"
+                          >
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              )}
+            </div>
           </div>
         )}
       </main>

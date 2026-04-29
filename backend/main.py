@@ -2,6 +2,11 @@ from fastapi import FastAPI, UploadFile, File, Form
 from fastapi.middleware.cors import CORSMiddleware
 import os
 import shutil
+from dotenv import load_dotenv
+
+# Load HF_TOKEN and other env vars
+load_dotenv()
+from fastapi.staticfiles import StaticFiles
 from typing import List, Dict, Any, Optional
 from pydantic import BaseModel
 import numpy as np
@@ -23,6 +28,11 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Ensure uploads directory exists
+UPLOAD_DIR = "uploads"
+os.makedirs(UPLOAD_DIR, exist_ok=True)
+app.mount("/uploads", StaticFiles(directory=UPLOAD_DIR), name="uploads")
 
 # Initialize Services
 # Note: In production, use dependency injection or singleton pattern
@@ -56,6 +66,26 @@ async def get_db_jobs():
 async def get_job_applications(job_id: int):
     return db_service.get_applications_for_job(job_id)
 
+@app.get("/api/applications/bulk")
+async def get_bulk_applications(ids: str):
+    try:
+        app_ids = [int(i) for i in ids.split(",")]
+        return db_service.get_applications_by_ids(app_ids)
+    except:
+        return []
+
+@app.put("/api/jobs/{job_id}")
+async def update_job(job_id: int, job: JobCreate):
+    return db_service.update_job(job_id, job.title, job.description)
+
+@app.delete("/api/jobs/{job_id}")
+async def delete_job(job_id: int):
+    return db_service.delete_job(job_id)
+
+@app.delete("/api/applications/{app_id}")
+async def delete_application(app_id: int):
+    return db_service.delete_application(app_id)
+
 @app.get("/jobs")
 async def get_jobs():
     return graph_service.get_all_jobs()
@@ -83,10 +113,10 @@ async def analyze_resume(
     print(f"Job ID: {job_id}")
     print("#"*60)
 
-    # 1. Save File Temporarily
-    temp_dir = "temp_uploads"
-    os.makedirs(temp_dir, exist_ok=True)
-    file_path = os.path.join(temp_dir, file.filename)
+    # 1. Save File Permanently
+    import time
+    filename = f"{int(time.time())}_{file.filename}"
+    file_path = os.path.join(UPLOAD_DIR, filename)
     with open(file_path, "wb") as buffer:
         shutil.copyfileobj(file.file, buffer)
 
@@ -168,14 +198,28 @@ async def analyze_resume(
         print(f"[8/8] Final aggregated score: {final_score}")
         
         candidate_name = parsed_data["extracted_fields"].get("contact", {}).get("name", "Unknown")
+        # 9. Recommendations for missing skills
+        recommendations = rec_service.get_recommendations(missing_skills)
+        
+        app_details = {
+            "matched_skills": matched_skills,
+            "missing_skills": missing_skills,
+            "fraud_report": fraud_result,
+            "similarity_report": sim_result["details"],
+            "recommendations": recommendations
+        }
+        
+        app_record = None
         if job_id is not None:
-            db_service.create_application(
+            app_record = db_service.create_application(
                 job_id=job_id,
                 candidate_name=candidate_name,
                 final_score=round(final_score, 2),
                 skill_match=round(skill_match_final, 2),
                 semantic_similarity=round(semantic_score, 2),
-                fraud_integrity=round(integrity_score, 2)
+                fraud_integrity=round(integrity_score, 2),
+                resume_path=f"/uploads/{filename}",
+                details=app_details
             )
 
         # 9. Recommendations for missing skills
@@ -196,7 +240,8 @@ async def analyze_resume(
             for item in sim_result["details"]
         ]
         return {
-            "candidate_name": parsed_data["extracted_fields"].get("contact", {}).get("name", "Unknown"),
+            "application_id": app_record["id"] if app_record else None,
+            "candidate_name": candidate_name,
             "final_score": round(final_score, 2),
             "breakdown": {
                 "skill_match": round(skill_match_final, 2),
@@ -212,16 +257,14 @@ async def analyze_resume(
             "recommendations": recommendations,
             "job_prediction": job_prediction
         }
-
     except Exception as e:
         print(f"\n!!! ERROR in /analyze: {type(e).__name__}: {e}")
         import traceback
         traceback.print_exc()
         raise
     finally:
-        if os.path.exists(file_path):
-            os.remove(file_path)
-            print(f"       Temp file cleaned: {file_path}")
+        # No longer deleting the file because we want it to persist in /uploads
+        pass
 
 @app.get("/jobs")
 async def get_jobs():

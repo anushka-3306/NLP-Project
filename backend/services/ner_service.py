@@ -1,4 +1,5 @@
 import re
+import os
 from typing import List, Set
 from transformers import AutoTokenizer, AutoModelForTokenClassification, pipeline
 
@@ -6,8 +7,9 @@ class NERService:
     def __init__(self, skills_list: List[str] = None):
         print("Initializing NERService with Transformer model...")
         self.model_name = "dbmdz/bert-large-cased-finetuned-conll03-english"
-        self.tokenizer = AutoTokenizer.from_pretrained(self.model_name)
-        self.model = AutoModelForTokenClassification.from_pretrained(self.model_name)
+        hf_token = os.getenv("HF_TOKEN")
+        self.tokenizer = AutoTokenizer.from_pretrained(self.model_name, token=hf_token)
+        self.model = AutoModelForTokenClassification.from_pretrained(self.model_name, token=hf_token)
         self.ner_pipeline = pipeline("ner", model=self.model, tokenizer=self.tokenizer, aggregation_strategy="simple")
         
         self.stopwords = {

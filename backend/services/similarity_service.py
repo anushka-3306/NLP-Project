@@ -1,19 +1,34 @@
-from FlagEmbedding import BGEM3FlagModel
 import re
+import os
+import numpy as np
 from typing import List, Dict, Any
+
+from FlagEmbedding import BGEM3FlagModel
 
 class SimilarityService:
     def __init__(self, model_name: str = 'BAAI/bge-m3', use_fp16: bool = True):
+        # FlagEmbedding uses transformers internally which respects HF_TOKEN env var
+        # but we can also set it explicitly in the environment for this process
+        if os.getenv("HF_TOKEN"):
+            os.environ["HUGGING_FACE_HUB_TOKEN"] = os.getenv("HF_TOKEN")
+            
         print(f"Loading {model_name} Model...")
+        # use_fp16=True is faster on GPU, falls back gracefully on CPU
         self.model = BGEM3FlagModel(model_name, use_fp16=use_fp16)
-        # Thresholds from notebook logic
-        self.PERFECT_SCORE_CAP = 0.50
-        self.MIN_THRESHOLD = 0.20
+        # Calibration thresholds
+        self.PERFECT_SCORE_CAP = 0.75
+        self.MIN_THRESHOLD = 0.35
 
     def segment_text(self, text: str) -> List[str]:
-        # Improved chunking from notebook
-        chunks = re.split(r'\n(?=[A-Z•-])|\.\s', text)
-        return [c.strip().replace('\n', ' ') for c in chunks if len(c.strip()) > 15]
+        # Split by newlines or sentence endings
+        raw_chunks = re.split(r'\n|\.\s', text)
+        processed = []
+        for c in raw_chunks:
+            clean = c.strip().replace('\n', ' ')
+            if len(clean) > 20:
+                # Truncate extremely long chunks to prevent model overflow
+                processed.append(clean[:1000])
+        return processed
 
     def compute_similarity(self, jd_text: str, resume_text: str) -> Dict[str, Any]:
         print("\n" + "="*60)
@@ -22,72 +37,51 @@ class SimilarityService:
         print(f"Resume text length: {len(resume_text)}")
 
         resume_chunks = self.segment_text(resume_text)
-        jd_sentences = [s.strip() for s in jd_text.split('.') if len(s.strip()) > 10]
-
-        print(f"Resume chunks: {len(resume_chunks)}")
-        for i, chunk in enumerate(resume_chunks[:3]):
-            print(f"  Chunk {i+1}: {chunk[:80]}...")
-        print(f"JD sentences: {len(jd_sentences)}")
-        for i, sent in enumerate(jd_sentences[:3]):
-            print(f"  Sent {i+1}: {sent[:80]}...")
+        jd_sentences = [s.strip() for s in jd_text.split('.') if len(s.strip()) > 15]
 
         if not jd_sentences or not resume_chunks:
-            print("WARNING: No JD sentences or resume chunks to compare")
             return {"overall_score": 0, "details": []}
 
+        print(f"Analyzing {len(jd_sentences)} requirements against {len(resume_chunks)} resume segments...")
+
+        # 1. Pre-calculate Resume Embeddings (Massively faster)
+        # Using 'dense_vecs' for fast cosine similarity
+        resume_embeddings = self.model.encode(resume_chunks, batch_size=12)['dense_vecs']
+        
         total_normalized_score = 0
         results = []
 
-        for i, req in enumerate(jd_sentences):
-            print(f"\n--- Processing JD requirement {i+1}/{len(jd_sentences)} ---")
-            print(f"  JD: '{req[:100]}'")
+        # 2. Compare each JD requirement
+        for req in jd_sentences:
+            jd_embedding = self.model.encode([req])['dense_vecs']
+            
+            # Compute Cosine Similarities
+            # Similarity = (A . B) / (||A|| ||B||)
+            # BGE-M3 dense vecs are usually normalized, so simple dot product works
+            similarities = np.dot(resume_embeddings, jd_embedding.T).flatten()
+            
+            raw_score = float(np.max(similarities))
+            best_idx = int(np.argmax(similarities))
+            
+            best_match = resume_chunks[best_idx] if raw_score >= self.MIN_THRESHOLD else "Insufficient match found"
 
-            sentence_pairs = [[req, chunk] for chunk in resume_chunks]
-            print(f"  Created {len(sentence_pairs)} pairs")
-
-            scores = self.model.compute_score(
-                sentence_pairs,
-                max_passage_length=128,
-                weights_for_different_modes=[0.4, 0.3, 0.3]
-            )
-
-            print(f"  Scores type: {type(scores).__name__}")
-            print(f"  Scores (raw): {scores}")
-
-            # FlagEmbedding may return a list or a dict depending on version
-            if isinstance(scores, list):
-                # List of floats: [dense, sparse, colbert] or weighted combo
-                raw_score = max(scores) if scores else 0
-                best_match = resume_chunks[scores.index(raw_score)] if raw_score >= self.MIN_THRESHOLD else "NO MATCH FOUND"
-                print(f"  List mode - raw_score: {raw_score}, best_match: '{best_match[:50]}'")
-            elif isinstance(scores, dict):
-                available_keys = list(scores.keys())
-                print(f"  Dict keys: {available_keys}")
-                hybrid_scores = scores.get('colbert+sparse+dense', [])
-                raw_score = max(hybrid_scores) if hybrid_scores else 0
-                best_match = resume_chunks[hybrid_scores.index(raw_score)] if raw_score >= self.MIN_THRESHOLD else "NO MATCH FOUND"
-                print(f"  Dict mode - raw_score: {raw_score}, best_match: '{best_match[:50]}'")
-            else:
-                raw_score = 0
-                best_match = "NO MATCH FOUND"
-                print(f"  Unknown mode - raw_score: {raw_score}")
-
-            # Scale to 0-100
+            # Scale to 0-100 based on calibrated thresholds
             normalized_score = 0
             if raw_score >= self.MIN_THRESHOLD:
-                normalized_score = min(100, (raw_score / self.PERFECT_SCORE_CAP) * 100)
-
-            print(f"  Normalized score: {normalized_score}")
+                # Map [MIN_THRESHOLD, PERFECT_SCORE_CAP] to [40, 100]
+                # Using a slightly different scaling for dense vecs
+                normalized_score = min(100, ((raw_score - 0.2) / (self.PERFECT_SCORE_CAP - 0.2)) * 100)
+                normalized_score = max(0, normalized_score)
 
             total_normalized_score += normalized_score
             results.append({
-                "requirement": req,
+                "jd_sentence": req,
                 "best_match": best_match,
-                "score": normalized_score
+                "score": round(normalized_score / 100, 4) # API expects 0-1 range for detail table
             })
 
         final_score = total_normalized_score / len(jd_sentences)
-        print(f"\nFinal overall score: {final_score}")
+        print(f"Analysis Complete. Final Score: {round(final_score, 2)}%")
         print("="*60 + "\n")
 
         return {
