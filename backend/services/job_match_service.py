@@ -19,9 +19,9 @@ class JobMatchService:
         models_dir defaults to the project root (three levels above this file).
         """
         if models_dir is None:
-            # backend/services/ -> backend/ -> Aira/ -> project root
+            # backend/services/ -> backend/ -> project root
             models_dir = os.path.join(
-                os.path.dirname(__file__), "..", "..", ".."
+                os.path.dirname(__file__), "..", ".."
             )
 
         tfidf_path   = os.path.join(models_dir, "tfIDF.pkl")
@@ -32,7 +32,7 @@ class JobMatchService:
         with open(tfidf_path,   "rb") as f: self.tfidf    = pickle.load(f)
         with open(clf_path,     "rb") as f: self.clf      = pickle.load(f)
         with open(encoder_path, "rb") as f: self.encoding = pickle.load(f)
-        print("[JobMatchService] ✅ Models loaded.")
+        print("[JobMatchService] Models loaded.")
 
     # ------------------------------------------------------------------
     # Replicate the notebook's preprocessing pipeline exactly

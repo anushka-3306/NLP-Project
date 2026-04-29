@@ -387,85 +387,136 @@ export default function CandidatePage() {
           </div>
         ) : (
           /* RESULTS VIEW */
-          <div className="fade-up flex flex-col gap-6">
-            <button onClick={() => setResult(null)} className="text-slate-500 dark:text-slate-400 font-bold text-sm flex items-center gap-1.5 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors w-fit group">
-              <span className="group-hover:-translate-x-1 transition-transform">&larr;</span> Back to Application
-            </button>
+          <div className="fade-up flex flex-col gap-8 md:gap-12">
+            <div className="flex justify-between items-center">
+              <button onClick={() => setResult(null)} className="text-slate-500 dark:text-slate-400 font-bold text-sm flex items-center gap-1.5 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors w-fit group">
+                <span className="group-hover:-translate-x-1 transition-transform">&larr;</span> Back to Application
+              </button>
+            </div>
 
-            {/* Score Summary */}
-            <div className="w-full bg-white dark:bg-slate-800 rounded-lg p-8 border border-slate-200 dark:border-slate-700 shadow-sm flex flex-col md:flex-row items-center justify-between gap-8">
-              <div>
-                <h1 className="text-3xl font-bold font-['Manrope'] mb-1 text-slate-900 dark:text-white tracking-tight">{result.candidate_name}</h1>
-                <p className="text-slate-500 dark:text-slate-400 text-sm font-medium">Application for {selectedJob?.title}</p>
+            {/* Results Header / Candidate Identity */}
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 bg-white dark:bg-slate-800 p-6 md:p-8 rounded-xl relative overflow-hidden shadow-sm border border-slate-200 dark:border-slate-700">
+              <div className="absolute right-0 top-0 w-64 h-64 bg-indigo-500 rounded-full blur-3xl opacity-10 dark:opacity-20 -translate-y-1/2 translate-x-1/4 pointer-events-none"></div>
+              <div className="flex items-center gap-6 z-10 flex-wrap">
+                <img
+                  alt="Candidate Photo"
+                  className="w-20 h-20 rounded-full object-cover border-4 border-slate-50 dark:border-slate-900"
+                  src={`https://ui-avatars.com/api/?name=${result.candidate_name}&background=e0e7ff&color=4f46e5&size=128`}
+                />
+                <div>
+                  <h2 className="font-['Manrope'] text-2xl md:text-3xl font-extrabold text-slate-900 dark:text-white break-words">{result.candidate_name}</h2>
+                  <p className="font-['Inter'] text-slate-600 dark:text-slate-400 text-base mt-1">Applying for <span className="font-semibold text-indigo-600 dark:text-indigo-400">{selectedJob?.title}</span></p>
+                  <div className="flex gap-3 mt-3 flex-wrap">
+                    <span className="px-2.5 py-1 bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 text-xs rounded-sm font-medium">Just Analyzed</span>
+                    <span className="px-2.5 py-1 bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 text-xs rounded-sm font-medium break-all max-w-[200px]">{file?.name || result.resume_path?.split('/').pop()}</span>
+                  </div>
+                </div>
               </div>
 
-              <div className="flex gap-10">
-                <div className="text-center">
-                  <div className="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest mb-1">Match Confidence</div>
-                  <div className="text-4xl font-black" style={{ color: getScoreColor(result.final_score) }}>{result.final_score}%</div>
+              <div className="flex items-center gap-4 z-10 bg-slate-50/50 dark:bg-slate-900/50 backdrop-blur-md px-4 md:px-6 py-4 rounded-xl border border-slate-200 dark:border-slate-700">
+                <div className="text-right">
+                  <div className="font-['Manrope'] text-xs md:text-sm font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Overall AI Match</div>
+                  <div className="font-['Manrope'] text-3xl md:text-4xl font-extrabold" style={{ color: getScoreColor(result.final_score) }}>{result.final_score}%</div>
                 </div>
-                <div className="text-center">
-                  <div className="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest mb-1">Integrity Index</div>
-                  <div className="text-2xl font-bold text-slate-900 dark:text-white">{result.breakdown?.fraud_integrity || 0}%</div>
+                <div className="w-16 h-16 rounded-full border-4 border-slate-200 dark:border-slate-700 flex items-center justify-center relative">
+                  <svg className="absolute inset-0 w-full h-full -rotate-90" viewBox="0 0 36 36">
+                    <path className="text-slate-200 dark:text-slate-700" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" strokeWidth="3.8"></path>
+                    <path style={{ color: getScoreColor(result.final_score) }} d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" strokeDasharray={`${result.final_score}, 100`} strokeWidth="3.8"></path>
+                  </svg>
+                  <svg className="w-6 h-6 relative z-10" style={{ color: getScoreColor(result.final_score) }} fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15h-2v-2h2v2zm0-4h-2V7h2v6z" />
+                  </svg>
                 </div>
               </div>
+            </div>
 
-              <div>
-                <div className={`px-4 py-2 rounded font-black text-sm uppercase border shadow-sm ${getVerdictStyle(getVerdictFromScore(result.final_score))}`}>
-                  {getVerdictFromScore(result.final_score)}
+            {/* Bento Grid: Breakdown Cards */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
+              <div className="bg-white dark:bg-slate-800 p-6 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm flex flex-col gap-4">
+                <div className="flex justify-between items-center flex-wrap gap-2">
+                  <h3 className="font-['Manrope'] font-bold text-lg text-slate-900 dark:text-white flex items-center gap-2">
+                    <svg className="w-5 h-5 text-indigo-600 dark:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" /></svg>
+                    Skill Match
+                  </h3>
+                  <span className="font-['Manrope'] font-extrabold text-xl text-indigo-600 dark:text-indigo-400">{result.breakdown?.skill_match || 0}%</span>
                 </div>
+                <div className="w-full bg-slate-100 dark:bg-slate-700 h-2 rounded-full overflow-hidden">
+                  <div className="bg-indigo-600 dark:bg-indigo-500 h-full rounded-full transition-all duration-700 ease-out" style={{ width: `${result.breakdown?.skill_match || 0}%` }}></div>
+                </div>
+                <p className="text-sm text-slate-600 dark:text-slate-400 font-['Inter']">Alignment with core technical requirements based on job graph.</p>
+              </div>
+
+              <div className="bg-white dark:bg-slate-800 p-6 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm flex flex-col gap-4">
+                <div className="flex justify-between items-center flex-wrap gap-2">
+                  <h3 className="font-['Manrope'] font-bold text-lg text-slate-900 dark:text-white flex items-center gap-2">
+                    <svg className="w-5 h-5 text-indigo-600 dark:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129" /></svg>
+                    Semantic Fit
+                  </h3>
+                  <span className="font-['Manrope'] font-extrabold text-xl text-indigo-600 dark:text-indigo-400">{result.breakdown?.semantic_similarity || 0}%</span>
+                </div>
+                <div className="w-full bg-slate-100 dark:bg-slate-700 h-2 rounded-full overflow-hidden">
+                  <div className="bg-indigo-600 dark:bg-indigo-500 h-full rounded-full transition-all duration-700 ease-out" style={{ width: `${result.breakdown?.semantic_similarity || 0}%` }}></div>
+                </div>
+                <p className="text-sm text-slate-600 dark:text-slate-400 font-['Inter']">Contextual match between experience described and job responsibilities.</p>
+              </div>
+
+              <div className="bg-white dark:bg-slate-800 p-6 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm flex flex-col gap-4">
+                <div className="flex justify-between items-center flex-wrap gap-2">
+                  <h3 className="font-['Manrope'] font-bold text-lg text-slate-900 dark:text-white flex items-center gap-2">
+                    <svg className="w-5 h-5 text-indigo-600 dark:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>
+                    Integrity Score
+                  </h3>
+                  <span className="font-['Manrope'] font-extrabold text-xl text-indigo-600 dark:text-indigo-400">{result.breakdown?.fraud_integrity || 0}%</span>
+                </div>
+                <div className="w-full bg-slate-100 dark:bg-slate-700 h-2 rounded-full overflow-hidden">
+                  <div className="bg-indigo-600 dark:bg-indigo-500 h-full rounded-full transition-all duration-700 ease-out" style={{ width: `${result.breakdown?.fraud_integrity || 0}%` }}></div>
+                </div>
+                <p className="text-sm text-slate-600 dark:text-slate-400 font-['Inter']">Confidence based on timeline continuity and anomaly detection.</p>
               </div>
             </div>
 
             {/* Best Job Match Card */}
             {result.job_prediction && (
-              <div className="bg-white p-6 md:p-8 rounded-xl shadow-[0_4px_20px_rgb(46,0,82,0.04)] flex flex-col sm:flex-row items-start sm:items-center gap-6 relative overflow-hidden border border-[#f0e6ff]">
+              <div className="bg-white dark:bg-slate-800 p-6 md:p-8 rounded-xl shadow-sm flex flex-col sm:flex-row items-start sm:items-center gap-6 relative overflow-hidden border border-indigo-100 dark:border-indigo-900/50">
                 {/* Decorative orb */}
                 <div style={{
                   position: 'absolute', right: 0, top: 0,
                   width: 200, height: 200,
                   borderRadius: '50%',
-                  background: 'radial-gradient(circle, rgba(124,58,237,0.08) 0%, transparent 70%)',
+                  background: 'radial-gradient(circle, rgba(99,102,241,0.15) 0%, transparent 70%)',
                   transform: 'translate(30%, -30%)',
                   pointerEvents: 'none'
                 }} />
 
                 {/* Icon */}
-                <div style={{
-                  width: 56, height: 56, borderRadius: 16, flexShrink: 0,
-                  background: 'linear-gradient(135deg, #2e0052, #7c3aed)',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  boxShadow: '0 8px 20px rgba(46,0,82,0.2)'
-                }}>
+                <div className="w-14 h-14 rounded-2xl flex-shrink-0 bg-gradient-to-br from-indigo-600 to-purple-600 flex items-center justify-center shadow-lg shadow-indigo-500/20">
                   <svg width="26" height="26" fill="none" stroke="white" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5}
-                      d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                   </svg>
                 </div>
 
                 {/* Text */}
                 <div className="flex-1 z-10">
-                  <div style={{ fontSize: 11, fontWeight: 700, color: '#6b7280', textTransform: 'uppercase', letterSpacing: '.1em', marginBottom: 6 }}>
+                  <div className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-[0.1em] mb-1.5">
                     AI Career Match · TF-IDF + Logistic Regression
                   </div>
                   {result.job_prediction.low_confidence ? (
                     <div>
-                      <div style={{ fontFamily: 'Manrope', fontWeight: 800, fontSize: 22, color: '#374151' }}>
+                      <div className="font-['Manrope'] font-extrabold text-2xl text-slate-800 dark:text-slate-200">
                         Low Confidence Prediction
                       </div>
-                      <p style={{ fontSize: 13, color: '#6b7280', marginTop: 4 }}>
+                      <p className="text-[13px] text-slate-600 dark:text-slate-400 mt-1">
                         The model could not confidently classify this resume into a known category (confidence: {(result.job_prediction.confidence * 100).toFixed(1)}%).
                         This may indicate a highly specialised or mixed-domain profile.
                       </p>
                     </div>
                   ) : (
                     <div>
-                      <div style={{ fontFamily: 'Manrope', fontWeight: 800, fontSize: 26, color: '#2e0052' }}>
+                      <div className="font-['Manrope'] font-extrabold text-2xl md:text-3xl text-indigo-700 dark:text-indigo-400">
                         {result.job_prediction.predicted_category}
                       </div>
-                      <p style={{ fontSize: 13, color: '#6b7280', marginTop: 4 }}>
-                        Based on your resume content, our classifier recommends roles in{' '}
-                        <strong style={{ color: '#4b0082' }}>{result.job_prediction.predicted_category}</strong>.
+                      <p className="text-[13px] text-slate-600 dark:text-slate-400 mt-1">
+                        Based on your resume content, our classifier recommends roles in <strong className="text-indigo-600 dark:text-indigo-300">{result.job_prediction.predicted_category}</strong>.
                         Confidence: <strong>{(result.job_prediction.confidence * 100).toFixed(1)}%</strong>.
                       </p>
                     </div>
@@ -474,18 +525,12 @@ export default function CandidatePage() {
 
                 {/* Confidence Badge */}
                 {!result.job_prediction.low_confidence && (
-                  <div style={{ textAlign: 'center', flexShrink: 0, zIndex: 10 }}>
-                    <div style={{
-                      width: 72, height: 72, borderRadius: '50%',
-                      border: '4px solid #f0e6ff',
-                      background: 'linear-gradient(135deg, rgba(46,0,82,0.05), rgba(124,58,237,0.08))',
-                      display: 'flex', flexDirection: 'column',
-                      alignItems: 'center', justifyContent: 'center'
-                    }}>
-                      <div style={{ fontFamily: 'Manrope', fontWeight: 900, fontSize: 16, color: '#2e0052', lineHeight: 1 }}>
+                  <div className="text-center flex-shrink-0 z-10">
+                    <div className="w-[72px] h-[72px] rounded-full border-4 border-indigo-50 dark:border-indigo-900/30 bg-gradient-to-br from-slate-50 to-indigo-50/50 dark:from-slate-800 dark:to-indigo-900/20 flex flex-col items-center justify-center">
+                      <div className="font-['Manrope'] font-black text-base text-indigo-700 dark:text-indigo-400 leading-none">
                         {(result.job_prediction.confidence * 100).toFixed(0)}%
                       </div>
-                      <div style={{ fontSize: 9, color: '#7c3aed', fontWeight: 700, letterSpacing: '.05em', textTransform: 'uppercase', marginTop: 2 }}>
+                      <div className="text-[9px] text-indigo-600 dark:text-indigo-400 font-bold tracking-wider uppercase mt-0.5">
                         match
                       </div>
                     </div>
@@ -494,51 +539,148 @@ export default function CandidatePage() {
               </div>
             )}
 
-            {/* Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="bg-white dark:bg-slate-800 rounded-lg p-6 border border-slate-200 dark:border-slate-700 shadow-sm">
-                <h3 className="font-bold text-sm mb-6 text-slate-800 dark:text-slate-200 uppercase tracking-wider">Candidate DNA Profile</h3>
+            {/* Radar Chart from Existing */}
+            <div className="bg-white dark:bg-slate-800 rounded-lg p-6 border border-slate-200 dark:border-slate-700 shadow-sm w-full">
+              <h3 className="font-bold text-sm mb-6 text-slate-800 dark:text-slate-200 uppercase tracking-wider">Candidate DNA Profile</h3>
+              <div className="w-full flex justify-center h-[300px]">
                 <RadarChart breakdown={result.breakdown} finalScore={result.final_score} />
-              </div>
-
-              <div className="bg-white dark:bg-slate-800 rounded-lg p-6 border border-slate-200 dark:border-slate-700 shadow-sm flex flex-col gap-6">
-                <h3 className="font-bold text-sm text-slate-800 dark:text-slate-200 uppercase tracking-wider">Skill Intelligence</h3>
-
-                <div>
-                  <h4 className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-3 flex items-center gap-2">
-                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Verified Core Competencies
-                  </h4>
-                  <div className="flex flex-wrap gap-2">
-                    {result.details?.matched_skills?.map((s, i) => (
-                      <div key={i} className="px-2.5 py-1.5 bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800/50 rounded text-xs font-bold">
-                        {s}
-                      </div>
-                    ))}
-                    {!result.details?.matched_skills?.length && <span className="text-xs text-slate-400 italic">No direct skill matches detected.</span>}
-                  </div>
-                </div>
-
-                <div>
-                  <h4 className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-3 flex items-center gap-2">
-                    <span className="w-1.5 h-1.5 rounded-full bg-rose-500"></span> Identified Growth Areas
-                  </h4>
-                  <div className="flex flex-wrap gap-2">
-                    {result.details?.missing_skills?.map((s, i) => {
-                      const recLink = result.recommendations?.find(r => r.skill === s)?.resources?.[0];
-                      return (
-                        <div key={i} className="flex items-center gap-2 px-2.5 py-1.5 bg-rose-50 dark:bg-rose-900/20 text-rose-700 dark:text-rose-400 border border-rose-200 dark:border-rose-800/50 rounded text-xs font-bold transition-transform hover:scale-[1.02] cursor-default">
-                          {s}
-                          {recLink && <a href={recLink} target="_blank" rel="noreferrer" className="bg-rose-100 dark:bg-rose-800 px-1.5 py-0.5 rounded text-[10px] hover:bg-rose-200 transition-colors">Course</a>}
-                        </div>
-                      )
-                    })}
-                    {!result.details?.missing_skills?.length && <span className="text-xs text-slate-400 italic">All target skills present in profile.</span>}
-                  </div>
-                </div>
               </div>
             </div>
 
-            {/* Semantic Detail Table */}
+            {/* Detailed Analysis Layout */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
+
+              {/* Left Column: Skills Detail */}
+              <div className="flex flex-col gap-6 md:gap-8 bg-slate-50 dark:bg-slate-900/50 p-6 md:p-8 rounded-xl border border-slate-200 dark:border-slate-700/50">
+                <h3 className="font-['Manrope'] font-bold text-xl md:text-2xl text-slate-900 dark:text-white">Skill Extraction</h3>
+
+                <div>
+                  <h4 className="text-sm font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wider mb-4">Matched Core Skills</h4>
+                  <div className="flex flex-wrap gap-2">
+                    {result.details?.matched_skills?.length > 0 ? (
+                      result.details.matched_skills.map((skill, i) => (
+                        <span key={i} className="px-3 py-1.5 bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-400 text-sm font-medium rounded border border-emerald-200 dark:border-emerald-800/50 flex items-center gap-1.5 break-words max-w-full">
+                          <svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
+                          {skill}
+                        </span>
+                      ))
+                    ) : (
+                      <span className="text-sm text-slate-500 dark:text-slate-400">No core skills matched.</span>
+                    )}
+                  </div>
+                </div>
+
+                <div>
+                  <h4 className="text-sm font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wider mb-4">Missing or Weak Signals</h4>
+                  <div className="flex flex-wrap gap-2">
+                    {result.details?.missing_skills?.length > 0 ? (
+                      result.details.missing_skills.map((skill, i) => (
+                        <span key={i} className="px-3 py-1.5 bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 text-sm font-medium rounded flex items-center gap-1.5 break-words max-w-full">
+                          <svg className="w-4 h-4 flex-shrink-0 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+                          {skill}
+                        </span>
+                      ))
+                    ) : (
+                      <span className="text-sm text-slate-500 dark:text-slate-400">No significant gaps identified.</span>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              {/* Right Column: AI Insights & Fraud */}
+              <div className="flex flex-col gap-6 md:gap-8">
+
+                {/* AI Recommendations */}
+                <div className="bg-white dark:bg-slate-800 p-6 md:p-8 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 relative overflow-hidden">
+                  <div className="absolute left-0 top-0 bottom-0 w-1.5 bg-indigo-600 rounded-l-xl"></div>
+                  <h3 className="font-['Manrope'] font-bold text-xl text-slate-900 dark:text-white mb-4 flex items-center gap-2">
+                    <svg className="w-5 h-5 text-indigo-600 dark:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" /></svg>
+                    AI Recommendations
+                  </h3>
+                  <ul className="flex flex-col gap-4">
+                    {result.recommendations?.length > 0 ? (
+                      result.recommendations.map((rec, i) => (
+                        <li key={i} className="flex items-start gap-3">
+                          <svg className="w-5 h-5 text-indigo-600 dark:text-indigo-400 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
+                          <div className="text-sm text-slate-800 dark:text-slate-200 leading-relaxed">
+                            <p className="font-semibold">{rec.skill}</p>
+                            {rec.resources && rec.resources.length > 0 && (
+                              <ul className="list-disc ml-5 mt-1 space-y-1">
+                                {rec.resources.map(([title, link], idx) => (
+                                  <li key={idx} className="break-words">
+                                    <a href={link} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 text-indigo-600 dark:text-indigo-400 hover:underline">
+                                      {title}
+                                      <svg xmlns="http://www.w3.org/2000/svg" className="w-3 h-3 opacity-70" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 3h7m0 0v7m0-7L10 14" /></svg>
+                                    </a>
+                                  </li>
+                                ))}
+                              </ul>
+                            )}
+                          </div>
+                        </li>
+                      ))
+                    ) : (
+                      <li className="text-slate-500 dark:text-slate-400 text-sm">No recommendations available</li>
+                    )}
+                  </ul>
+                </div>
+
+                {/* Fraud Report Mini */}
+                <div className="bg-white dark:bg-slate-800 p-6 md:p-8 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700">
+                  <h3 className="font-['Manrope'] font-bold text-xl text-slate-900 dark:text-white mb-6 flex items-center gap-2">
+                    <svg className="w-5 h-5 text-indigo-600 dark:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+                    Integrity Checks
+                  </h3>
+                  <div className="flex flex-col gap-4">
+                    <div className="flex justify-between items-center py-2 border-b border-slate-100 dark:border-slate-700">
+                      <span className="text-sm font-medium text-slate-600 dark:text-slate-400">Overall Risk Verdict</span>
+                      <span className={`px-2 py-0.5 text-xs font-bold rounded-sm uppercase ${
+                        result.details?.fraud_report?.verdict === "High Risk" ? "bg-rose-100 text-rose-800 dark:bg-rose-900/30 dark:text-rose-400" :
+                        result.details?.fraud_report?.verdict === "Suspicious" ? "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400" :
+                        "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400"
+                      }`}>
+                        {result.details?.fraud_report?.verdict || "Low Risk"}
+                      </span>
+                    </div>
+                    <div className="flex justify-between items-center py-2 border-b border-slate-100 dark:border-slate-700 flex-wrap gap-2">
+                      <span className="text-sm font-medium text-slate-600 dark:text-slate-400">Timeline Continuity</span>
+                      <span className={`px-2 py-0.5 text-xs font-bold rounded-sm uppercase ${result.details?.fraud_report?.timeline_valid === false ? 'bg-rose-100 text-rose-800 dark:bg-rose-900/30 dark:text-rose-400' : 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400'}`}>
+                        {result.details?.fraud_report?.timeline_valid === false ? 'Flagged' : 'Clear'}
+                      </span>
+                    </div>
+                    <div className="flex justify-between items-center py-2 border-b border-slate-100 dark:border-slate-700 flex-wrap gap-2">
+                      <span className="text-sm font-medium text-slate-600 dark:text-slate-400">Keyword Stuffing Detected</span>
+                      <span className={`px-2 py-0.5 text-xs font-bold rounded-sm uppercase ${result.details?.fraud_report?.keyword_stuffing ? 'bg-rose-100 text-rose-800 dark:bg-rose-900/30 dark:text-rose-400' : 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400'}`}>
+                        {result.details?.fraud_report?.keyword_stuffing ? 'Detected' : 'Negative'}
+                      </span>
+                    </div>
+                    <div className="flex justify-between items-center py-2 flex-wrap gap-2">
+                      <span className="text-sm font-medium text-slate-600 dark:text-slate-400">Hidden Text Analysis</span>
+                      <span className={`px-2 py-0.5 text-xs font-bold rounded-sm uppercase ${result.details?.fraud_report?.hidden_text ? 'bg-rose-100 text-rose-800 dark:bg-rose-900/30 dark:text-rose-400' : 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400'}`}>
+                        {result.details?.fraud_report?.hidden_text ? 'Found' : 'Clean'}
+                      </span>
+                    </div>
+
+                    {result.details?.fraud_report?.flags?.length > 0 && (
+                      <div className="mt-4 border-t border-slate-100 dark:border-slate-700 pt-4">
+                        <h4 className="text-sm font-semibold text-slate-600 dark:text-slate-400 mb-3">Detected Issues</h4>
+                        <div className="flex flex-col">
+                          {result.details.fraud_report.flags.map((flag, i) => (
+                            <div key={i} className="flex justify-between items-center py-2 border-b border-slate-100 dark:border-slate-700 last:border-none">
+                              <span className="text-sm text-slate-600 dark:text-slate-400 pr-4">{flag}</span>
+                              <span className="px-2 py-0.5 text-[10px] font-bold rounded-sm bg-rose-100 text-rose-800 dark:bg-rose-900/30 dark:text-rose-400 whitespace-nowrap">FLAGGED</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+              </div>
+            </div>
+
+            {/* Semantic Detail Table (From Existing) */}
             {result.details?.similarity_report?.length > 0 && (
               <div className="bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 shadow-sm overflow-hidden">
                 <div className="p-5 border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/50 flex items-center justify-between">
@@ -569,6 +711,7 @@ export default function CandidatePage() {
                 </div>
               </div>
             )}
+
           </div>
         )}
       </main>

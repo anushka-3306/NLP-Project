@@ -8,10 +8,10 @@ scikit-learn
 pandas
 numpy
 joblib
-FlagEmbedding
-torch
-transformers
-nltk
 psycopg2-binary
 python-multipart
 python-dotenv
+torch
+transformers
+FlagEmbedding
+nltk
